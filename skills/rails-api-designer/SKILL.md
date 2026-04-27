@@ -2518,6 +2518,298 @@ def track_api_usage
 end
 ```
 
+### 11. Implement Internationalization (I18n) Properly
+
+APIs serving international audiences should support multiple locales for error messages, validation messages, and other user-facing content. Use thread-safe locale switching to prevent locale leaking between requests.
+
+#### Thread-Safe Locale Switching
+
+**❌ Bad: Using `before_action` with direct assignment**
+
+```ruby
+# app/controllers/api/base_controller.rb
+class Api::BaseController < ApplicationController
+  before_action :set_locale
+
+  private
+
+  def set_locale
+    # PROBLEM: In multi-threaded environments (Puma), this can leak
+    # the locale from one request to another if threads are reused
+    I18n.locale = params[:locale] || :en
+  end
+end
+```
+
+**✅ Good: Using `around_action` with `I18n.with_locale`**
+
+```ruby
+# app/controllers/api/base_controller.rb
+class Api::BaseController < ApplicationController
+  around_action :switch_locale
+
+  private
+
+  # Thread-safe locale switching: locale is scoped to this request only
+  # and automatically reverted after the action completes
+  def switch_locale(&action)
+    I18n.with_locale(detect_locale, &action)
+  end
+
+  # Override this method in subclasses to customize locale detection
+  def detect_locale
+    # Priority: query param > Accept-Language header > default
+    locale = params[:locale].presence || 
+             request.headers["Accept-Language"]&.split(",")&.first&.split("-")&.first
+    
+    # Validate against supported locales
+    I18n.available_locales.include?(locale&.to_sym) ? locale.to_sym : I18n.default_locale
+  end
+end
+```
+
+#### Locale Detection Strategies
+
+**1. Query Parameter (Explicit)**
+
+```ruby
+# Client specifies locale in URL
+GET /api/v1/users?locale=ar
+GET /api/v1/users?locale=en
+```
+
+**2. Accept-Language Header (Standard)**
+
+```ruby
+# Client sends HTTP header
+GET /api/v1/users
+Accept-Language: ar-SA,ar;q=0.9,en;q=0.8
+
+# In controller
+def detect_locale
+  header = request.headers["Accept-Language"]
+  locale = header&.split(",")&.first&.split("-")&.first
+  locale&.to_sym || :en
+end
+```
+
+**3. Subdomain (Permanent)**
+
+```ruby
+# ar.example.com, en.example.com
+def detect_locale
+  subdomain = request.subdomain
+  subdomain.presence&.to_sym || :en
+end
+```
+
+**4. User Preferences (Authenticated)**
+
+```ruby
+def detect_locale
+  current_user&.preferred_locale || detect_locale_from_header
+end
+```
+
+#### Customizing Locale per Controller
+
+Some controllers may need to override the default locale detection:
+
+```ruby
+# app/controllers/api/v1/webhooks/wati_controller.rb
+class Api::V1::Webhooks::WatiController < Api::BaseController
+  # Override detect_locale to always use Arabic for WhatsApp webhooks
+  # since our customer base is primarily Arabic-speaking
+  def detect_locale
+    :ar
+  end
+end
+```
+
+#### Localized Error Messages
+
+**Setup locale files:**
+
+```yaml
+# config/locales/validations.en.yml
+en:
+  validations:
+    required: "%{field} is required"
+    invalid_email: "%{field} must be a valid email address"
+    invalid_phone: "%{field} must be a valid phone number"
+```
+
+```yaml
+# config/locales/validations.ar.yml
+ar:
+  validations:
+    required: "%{field} مطلوب"
+    invalid_email: "%{field} يجب أن يكون عنوان بريد إلكتروني صحيح"
+    invalid_phone: "%{field} يجب أن يكون رقم هاتف صحيح"
+```
+
+**Use in validators:**
+
+```ruby
+# app/validators/my_validator.rb
+class MyValidator
+  def validate_required(field, value)
+    return if value.present?
+    
+    # I18n.locale is automatically set by around_action
+    I18n.t("validations.required", field: field_label(field))
+  end
+  
+  private
+  
+  def field_label(field)
+    # Return localized field name
+    I18n.locale == :ar ? @model.label_ar : @model.label_en
+  end
+end
+```
+
+#### Testing Locale Switching
+
+**Test locale detection:**
+
+```ruby
+# spec/controllers/api/base_controller_spec.rb
+RSpec.describe Api::BaseController, type: :controller do
+  controller do
+    def index
+      render json: { message: I18n.t("test.message") }
+    end
+  end
+
+  describe "locale switching" do
+    it "uses locale from query param" do
+      get :index, params: { locale: "ar" }
+      expect(I18n.locale).to eq(:ar)
+    end
+
+    it "uses locale from Accept-Language header" do
+      request.headers["Accept-Language"] = "ar-SA,ar;q=0.9"
+      get :index
+      expect(I18n.locale).to eq(:ar)
+    end
+
+    it "prefers query param over Accept-Language header" do
+      request.headers["Accept-Language"] = "ar"
+      get :index, params: { locale: "en" }
+      expect(I18n.locale).to eq(:en)
+    end
+
+    it "defaults to English when no locale specified" do
+      get :index
+      expect(I18n.locale).to eq(:en)
+    end
+    
+    it "does not leak locale between requests" do
+      # First request in Arabic
+      get :index, params: { locale: "ar" }
+      first_locale = I18n.locale
+      
+      # Second request with no locale
+      get :index
+      second_locale = I18n.locale
+      
+      # Locale should reset to default, not persist
+      expect(first_locale).to eq(:ar)
+      expect(second_locale).to eq(:en)
+    end
+  end
+end
+```
+
+**Test localized validation messages:**
+
+```ruby
+# spec/requests/api/v1/users_spec.rb
+RSpec.describe "Api::V1::Users", type: :request do
+  describe "POST /api/v1/users" do
+    context "with Arabic locale" do
+      it "returns validation errors in Arabic" do
+        post "/api/v1/users?locale=ar",
+             params: { user: { email: "" } },
+             headers: { "Content-Type" => "application/json" }
+        
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]["email"]).to include("البريد الإلكتروني مطلوب")
+      end
+    end
+    
+    context "with English locale" do
+      it "returns validation errors in English" do
+        post "/api/v1/users?locale=en",
+             params: { user: { email: "" } },
+             headers: { "Content-Type" => "application/json" }
+        
+        expect(response).to have_http_status(:unprocessable_entity)
+        json = JSON.parse(response.body)
+        expect(json["errors"]["email"]).to include("Email is required")
+      end
+    end
+  end
+end
+```
+
+#### Why `around_action` + `I18n.with_locale`?
+
+1. **Thread Safety**: Puma runs multiple threads. Direct `I18n.locale=` assignment can cause locale to leak between requests if threads are reused.
+
+2. **Automatic Cleanup**: `I18n.with_locale` automatically reverts the locale after the block executes, even if an exception is raised.
+
+3. **Rails Best Practice**: Documented in the [Rails I18n Guide](https://guides.rubyonrails.org/i18n.html#managing-the-locale-across-requests).
+
+**What can go wrong without it:**
+
+```ruby
+# Thread 1: Arabic request
+I18n.locale = :ar  # Sets global state
+
+# Thread 1: Processing... (takes 500ms)
+
+# Thread 2: English request (reuses Thread 1 after it finishes)
+# Thread 2 now has I18n.locale = :ar from previous request!
+# English user sees Arabic error messages
+```
+
+#### API Response Example
+
+**Request:**
+```http
+GET /api/v1/users/123?locale=ar
+```
+
+**Response (Arabic):**
+```json
+{
+  "error": {
+    "code": "not_found",
+    "message": "لم يتم العثور على المستخدم",
+    "status": 404
+  }
+}
+```
+
+**Request:**
+```http
+GET /api/v1/users/123?locale=en
+```
+
+**Response (English):**
+```json
+{
+  "error": {
+    "code": "not_found",
+    "message": "User not found",
+    "status": 404
+  }
+}
+```
+
 ## Common Mistakes
 
 ### 1. Not Handling N+1 Queries
