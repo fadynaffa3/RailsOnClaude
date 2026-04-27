@@ -122,15 +122,6 @@ Step-by-step playbooks for common Rails tasks:
 - **[Skills Catalog](CATALOG.md)** - Complete reference of all skills
 - **[Next Steps](NEXT_STEPS.md)** - Post-publishing guide
 
-## 🔧 Tool Compatibility
-
-| Tool | Status | Installation Path |
-|------|--------|------------------|
-| Claude Code | ✅ Full support | `~/.claude/skills/` or `.agents/skills/` |
-| Cursor | ✅ Full support | `.cursor/skills/` |
-| Windsurf | 🚧 Coming soon | TBD |
-| GitHub Copilot | ⚠️ Limited | N/A (no skill system) |
-
 ## 🌟 Featured Skills
 
 ### rails-audit
