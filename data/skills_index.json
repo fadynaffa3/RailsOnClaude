@@ -1,101 +1,193 @@
 {
   "version": "1.0.0",
   "last_updated": "2026-04-27",
-  "total_skills": 3,
+  "total_skills": 18,
   "skills": [
     {
       "name": "rails-audit",
       "path": "skills/rails-audit",
-      "description": "Comprehensive code audit for Ruby on Rails applications covering testing, security, architecture, performance, Ruby idioms, Rails conventions, and code quality. Analyzes RSpec/Minitest tests, security vulnerabilities (SQL injection, XSS, mass assignment), code design (PORO patterns, SOLID principles), ActiveRecord optimization, N+1 queries, metaprogramming patterns, and database design. Outputs detailed audit report with automated metrics from SimpleCov (coverage) and RubyCritic (complexity). Severity-ranked findings (Critical, High, Medium, Low) with actionable refactoring recommendations.",
+      "description": "Comprehensive code audit for Ruby on Rails applications covering testing, security, architecture, performance, Ruby idioms, Rails conventions, and code quality.",
       "category": "code-quality",
       "tags": ["audit", "testing", "security", "rspec", "code-review", "quality", "ruby", "rails"],
-      "risk": "low",
-      "features": [
-        "Test coverage analysis with SimpleCov",
-        "Code complexity metrics with RubyCritic",
-        "Security vulnerability detection",
-        "Ruby idioms and best practices analysis",
-        "Rails conventions compliance checking",
-        "Fat model/controller detection",
-        "PORO refactoring recommendations",
-        "N+1 query detection",
-        "Law of Demeter violations",
-        "Metaprogramming patterns analysis",
-        "Performance optimization opportunities"
-      ],
-      "output": "RAILS_AUDIT_REPORT.md",
-      "subagents": ["simplecov_agent", "rubycritic_agent"],
-      "references": [
-        "code_smells.md",
-        "testing_guidelines.md",
-        "poro_patterns.md",
-        "security_checklist.md",
-        "rails_antipatterns.md",
-        "ruby_idioms.md",
-        "rails_conventions.md",
-        "report_template.md"
-      ]
+      "risk": "low"
+    },
+    {
+      "name": "rails-code-reviewer",
+      "path": "skills/rails-code-reviewer",
+      "description": "Automated code review focusing on SOLID principles, concurrency safety, performance patterns, and Rails best practices.",
+      "category": "code-quality",
+      "tags": ["code-review", "solid", "concurrency", "performance", "best-practices"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-dead-code-finder",
+      "path": "skills/rails-dead-code-finder",
+      "description": "Detects unused code in Rails applications including unreferenced services, methods, orphaned files, and commented code.",
+      "category": "code-quality",
+      "tags": ["dead-code", "cleanup", "refactoring", "maintenance", "unused-code"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-test-helper",
+      "path": "skills/rails-test-helper",
+      "description": "RSpec and testing best practices for Rails applications including FactoryBot, test doubles, and TDD/BDD patterns.",
+      "category": "testing",
+      "tags": ["rspec", "testing", "factory-bot", "tdd", "bdd", "test-doubles"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-db-optimizer",
+      "path": "skills/rails-db-optimizer",
+      "description": "Database optimization including migration best practices, index optimization, query performance analysis, and database design patterns.",
+      "category": "performance",
+      "tags": ["database", "optimization", "indexes", "migrations", "query-performance"],
+      "risk": "medium"
+    },
+    {
+      "name": "rails-performance-optimizer",
+      "path": "skills/rails-performance-optimizer",
+      "description": "Application performance optimization including caching strategies, query optimization, and Rails-specific performance patterns.",
+      "category": "performance",
+      "tags": ["performance", "caching", "optimization", "n+1", "eager-loading"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-security-audit",
+      "path": "skills/rails-security-audit",
+      "description": "Security vulnerability scanning and OWASP compliance checking for Rails applications.",
+      "category": "security",
+      "tags": ["security", "vulnerabilities", "owasp", "sql-injection", "xss"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-api-designer",
+      "path": "skills/rails-api-designer",
+      "description": "RESTful API design patterns, JSON API implementation, versioning strategies, and API documentation.",
+      "category": "api",
+      "tags": ["api", "rest", "json-api", "versioning", "documentation"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-refactoring-guide",
+      "path": "skills/rails-refactoring-guide",
+      "description": "Code refactoring patterns, SOLID principles, and architectural improvements for Rails applications.",
+      "category": "architecture",
+      "tags": ["refactoring", "solid", "architecture", "design-patterns"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-docker",
+      "path": "skills/rails-docker",
+      "description": "Docker and Docker Compose setup for Rails applications including production-ready configurations.",
+      "category": "devops",
+      "tags": ["docker", "docker-compose", "containers", "deployment"],
+      "risk": "medium"
+    },
+    {
+      "name": "rails-dip",
+      "path": "skills/rails-dip",
+      "description": "Dip (Docker Interaction Process) integration for simplified Docker workflows in Rails development.",
+      "category": "devops",
+      "tags": ["dip", "docker", "workflow", "development-tools"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-monitoring",
+      "path": "skills/rails-monitoring",
+      "description": "Application monitoring setup including APM tools, log aggregation, error tracking, uptime monitoring, and performance dashboards.",
+      "category": "monitoring",
+      "tags": ["monitoring", "apm", "logging", "observability", "metrics"],
+      "risk": "medium"
+    },
+    {
+      "name": "rails-jobs-helper",
+      "path": "skills/rails-jobs-helper",
+      "description": "Background job patterns with Sidekiq and Solid Queue including job design, error handling, and monitoring.",
+      "category": "background-jobs",
+      "tags": ["sidekiq", "solid-queue", "background-jobs", "async"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-turbo-stimulus",
+      "path": "skills/rails-turbo-stimulus",
+      "description": "Hotwire integration including Turbo Frames, Turbo Streams, and Stimulus controllers for modern Rails frontend.",
+      "category": "frontend",
+      "tags": ["hotwire", "turbo", "stimulus", "frontend", "spa"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-docs-generator",
+      "path": "skills/rails-docs-generator",
+      "description": "Automated documentation generation for Rails APIs including Swagger/OpenAPI and Postman collections.",
+      "category": "documentation",
+      "tags": ["documentation", "swagger", "openapi", "postman", "api-docs"],
+      "risk": "low"
+    },
+    {
+      "name": "rails-packwerk",
+      "path": "skills/rails-packwerk",
+      "description": "Shopify's Packwerk integration for modular Rails architecture and enforcing package boundaries.",
+      "category": "architecture",
+      "tags": ["packwerk", "modularity", "boundaries", "architecture"],
+      "risk": "medium"
     },
     {
       "name": "ruby-help",
       "path": "skills/ruby-help",
-      "description": "Expert guidance for writing idiomatic Ruby code with metaprogramming, Rails patterns, and performance optimization. Specializes in gem development and testing frameworks.",
+      "description": "Expert guidance for writing idiomatic Ruby code with metaprogramming, Rails patterns, and performance optimization.",
       "category": "language-expertise",
-      "tags": ["ruby", "metaprogramming", "performance", "gems", "testing", "rspec", "minitest"],
-      "risk": "low",
-      "features": [
-        "Ruby 3.x modern syntax and features",
-        "Metaprogramming patterns (modules, mixins, DSLs)",
-        "Gem development and versioning",
-        "Performance optimization and profiling",
-        "RSpec and Minitest testing patterns",
-        "RuboCop integration",
-        "Block and enumerable patterns",
-        "Exception handling best practices"
-      ],
-      "focus_areas": [
-        "Clean, maintainable Ruby code",
-        "Ruby expressiveness and idioms",
-        "Performance benchmarking",
-        "Static analysis integration"
-      ]
+      "tags": ["ruby", "metaprogramming", "performance", "gems", "testing"],
+      "risk": "low"
     },
     {
       "name": "rails-help",
       "path": "skills/rails-help",
       "description": "Expert in Ruby on Rails development with conventions and best practices for MVC architecture, ActiveRecord, Hotwire, security, and testing.",
       "category": "framework-expertise",
-      "tags": ["rails", "mvc", "activerecord", "hotwire", "security", "testing", "performance"],
-      "risk": "low",
-      "features": [
-        "Rails conventions (Convention over Configuration)",
-        "ActiveRecord patterns and optimization",
-        "N+1 query prevention with eager loading",
-        "Fragment and Russian Doll caching",
-        "Service objects for business logic",
-        "Hotwire (Turbo + Stimulus) integration",
-        "ViewComponents for reusable UI",
-        "Strong parameters and CSRF protection",
-        "RESTful routing patterns"
-      ],
-      "architecture": [
-        "Thin controllers, fat models (with limits)",
-        "Concerns for shared functionality",
-        "Background jobs (Sidekiq/ActiveJob)",
-        "RESTful routing conventions"
-      ],
-      "testing": [
-        "RSpec/Minitest with TDD",
-        "FactoryBot for test data",
-        "Mocking external services",
-        "Shared examples for DRY tests"
-      ]
+      "tags": ["rails", "mvc", "activerecord", "hotwire", "security"],
+      "risk": "low"
     }
   ],
   "categories": {
     "code-quality": {
       "name": "Code Quality & Auditing",
-      "skills": ["rails-audit"]
+      "skills": ["rails-audit", "rails-code-reviewer", "rails-dead-code-finder"]
+    },
+    "testing": {
+      "name": "Testing",
+      "skills": ["rails-test-helper"]
+    },
+    "performance": {
+      "name": "Database & Performance",
+      "skills": ["rails-db-optimizer", "rails-performance-optimizer"]
+    },
+    "security": {
+      "name": "Security",
+      "skills": ["rails-security-audit"]
+    },
+    "api": {
+      "name": "API & Architecture",
+      "skills": ["rails-api-designer", "rails-refactoring-guide"]
+    },
+    "devops": {
+      "name": "DevOps & Infrastructure",
+      "skills": ["rails-docker", "rails-dip", "rails-monitoring"]
+    },
+    "background-jobs": {
+      "name": "Background Jobs",
+      "skills": ["rails-jobs-helper"]
+    },
+    "frontend": {
+      "name": "Frontend & UI",
+      "skills": ["rails-turbo-stimulus"]
+    },
+    "documentation": {
+      "name": "Documentation",
+      "skills": ["rails-docs-generator"]
+    },
+    "architecture": {
+      "name": "Modular Architecture",
+      "skills": ["rails-packwerk"]
     },
     "language-expertise": {
       "name": "Language Expertise",
@@ -110,12 +202,27 @@
     {
       "name": "rails-backend-dev",
       "description": "Essential skills for Ruby on Rails backend development",
-      "skills": ["rails-help", "ruby-help", "rails-audit"]
+      "skills": ["rails-help", "ruby-help", "rails-audit", "rails-test-helper", "rails-db-optimizer"]
     },
     {
       "name": "rails-auditor",
       "description": "Code audit and quality assurance skills",
-      "skills": ["rails-audit", "ruby-help"]
+      "skills": ["rails-audit", "rails-code-reviewer", "rails-dead-code-finder", "rails-security-audit", "ruby-help"]
+    },
+    {
+      "name": "rails-devops",
+      "description": "DevOps and infrastructure skills",
+      "skills": ["rails-docker", "rails-dip", "rails-monitoring", "rails-jobs-helper"]
+    },
+    {
+      "name": "rails-api-dev",
+      "description": "API development and design skills",
+      "skills": ["rails-api-designer", "rails-help", "rails-security-audit", "rails-docs-generator"]
+    },
+    {
+      "name": "rails-performance",
+      "description": "Performance optimization skills",
+      "skills": ["rails-performance-optimizer", "rails-db-optimizer", "rails-monitoring"]
     }
   ]
 }

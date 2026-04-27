@@ -1,6 +1,6 @@
 # RailsOnClaude 🛤️
 
-> A curated collection of AI assistant skills for Ruby on Rails development with Claude Code, Cursor, and other AI coding tools.
+> A curated collection of 18 AI assistant skills for Ruby on Rails development with Claude Code, Cursor, and other AI coding tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -14,6 +14,7 @@ npx skills add fadynaffa3/RailsOnClaude
 
 # Or install individual skills
 npx skills add fadynaffa3/RailsOnClaude/skills/rails-audit
+npx skills add fadynaffa3/RailsOnClaude/skills/rails-dead-code-finder
 npx skills add fadynaffa3/RailsOnClaude/skills/ruby-help
 npx skills add fadynaffa3/RailsOnClaude/skills/rails-help
 ```
@@ -38,6 +39,9 @@ cp -r skills/* /path/to/your/rails/project/.agents/skills/
 # Install only the rails audit skill
 cp -r skills/rails-audit ~/.claude/skills/
 
+# Install only the dead code finder skill
+cp -r skills/rails-dead-code-finder ~/.claude/skills/
+
 # Install only Ruby help skill
 cp -r skills/ruby-help ~/.claude/skills/
 
@@ -50,6 +54,7 @@ cp -r skills/rails-help ~/.claude/skills/
 **In Claude Code session:**
 ```
 /rails-audit                     # Run comprehensive Rails audit
+/rails-dead-code-finder          # Find and remove unused code
 /ruby-help                       # Get Ruby best practices help
 /rails-help                      # Get Rails framework guidance
 ```
@@ -64,32 +69,58 @@ This collection includes battle-tested skills for:
 - **Security**: Vulnerability scanning, best practices, OWASP compliance
 - **Performance**: N+1 detection, database optimization, caching strategies
 
-## 🎯 Skills Catalog
+## 🎯 Skills Catalog (18 Total)
 
-### Code Quality & Auditing
+### Code Quality & Auditing (3 skills)
 
 - **[rails-audit](skills/rails-audit/SKILL.md)** - Comprehensive code audits with test coverage, security, and quality metrics
-  - RSpec test coverage analysis with SimpleCov
-  - Code complexity metrics with RubyCritic
-  - Security vulnerability detection
-  - Ruby idioms and best practices analysis
-  - Rails conventions compliance
-  - PORO patterns and service object refactoring
-  - Rails anti-patterns identification
+- **[rails-code-reviewer](skills/rails-code-reviewer/SKILL.md)** - Automated code review for SOLID principles, concurrency, and performance
+- **[rails-dead-code-finder](skills/rails-dead-code-finder/SKILL.md)** - Detect and remove unused code
 
-### Language & Framework Expertise
+### Testing (1 skill)
+
+- **[rails-test-helper](skills/rails-test-helper/SKILL.md)** - RSpec and testing best practices for Rails applications
+
+### Database & Performance (2 skills)
+
+- **[rails-db-optimizer](skills/rails-db-optimizer/SKILL.md)** - Database optimization, migrations, and index management
+- **[rails-performance-optimizer](skills/rails-performance-optimizer/SKILL.md)** - Application performance optimization and caching strategies
+
+### Security (1 skill)
+
+- **[rails-security-audit](skills/rails-security-audit/SKILL.md)** - Security vulnerability scanning and OWASP compliance
+
+### API & Architecture (2 skills)
+
+- **[rails-api-designer](skills/rails-api-designer/SKILL.md)** - RESTful API design and JSON API implementation
+- **[rails-refactoring-guide](skills/rails-refactoring-guide/SKILL.md)** - Code refactoring patterns and SOLID principles
+
+### DevOps & Infrastructure (3 skills)
+
+- **[rails-docker](skills/rails-docker/SKILL.md)** - Docker and Docker Compose setup for Rails
+- **[rails-dip](skills/rails-dip/SKILL.md)** - Dip (Docker Interaction Process) integration
+- **[rails-monitoring](skills/rails-monitoring/SKILL.md)** - APM, logging, and application monitoring
+
+### Background Jobs (1 skill)
+
+- **[rails-jobs-helper](skills/rails-jobs-helper/SKILL.md)** - Background job patterns with Sidekiq and Solid Queue
+
+### Frontend & UI (1 skill)
+
+- **[rails-turbo-stimulus](skills/rails-turbo-stimulus/SKILL.md)** - Hotwire (Turbo Frames, Turbo Streams, Stimulus) integration
+
+### Documentation (1 skill)
+
+- **[rails-docs-generator](skills/rails-docs-generator/SKILL.md)** - Automated documentation generation for Rails APIs
+
+### Modular Architecture (1 skill)
+
+- **[rails-packwerk](skills/rails-packwerk/SKILL.md)** - Shopify's Packwerk for modular Rails architecture
+
+### Language Expertise (2 skills)
 
 - **[ruby-help](skills/ruby-help/SKILL.md)** - Idiomatic Ruby with metaprogramming and performance optimization
-  - Ruby 3.x features and patterns
-  - Metaprogramming and DSL design
-  - Gem development and versioning
-  - RSpec/Minitest testing patterns
-
 - **[rails-help](skills/rails-help/SKILL.md)** - Rails conventions and MVC best practices
-  - ActiveRecord patterns and optimization
-  - Hotwire (Turbo + Stimulus) integration
-  - Strong parameters and security
-  - Background jobs with Sidekiq/ActiveJob
 
 ## 🎭 Role-Based Bundles
 
@@ -108,9 +139,10 @@ Includes: `rails-help`, `ruby-help`, `rails-audit`
 ```bash
 # Install audit skills
 cp -r skills/rails-audit ~/.claude/skills/
+cp -r skills/rails-dead-code-finder ~/.claude/skills/
 cp -r skills/ruby-help ~/.claude/skills/
 ```
-Includes: `rails-audit`, `ruby-help` - comprehensive code quality and security analysis
+Includes: `rails-audit`, `rails-dead-code-finder`, `ruby-help` - comprehensive code quality, dead code detection, and security analysis
 
 See [bundles/rails-auditor](bundles/rails-auditor/README.md) for more details.
 

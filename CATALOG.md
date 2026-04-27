@@ -5,6 +5,15 @@ Complete reference of all skills in the RailsOnClaude collection.
 ## Table of Contents
 
 - [Code Quality & Auditing](#code-quality--auditing)
+- [Testing](#testing)
+- [Database & Performance](#database--performance)
+- [Security](#security)
+- [API & Architecture](#api--architecture)
+- [DevOps & Infrastructure](#devops--infrastructure)
+- [Background Jobs](#background-jobs)
+- [Frontend & UI](#frontend--ui)
+- [Documentation](#documentation)
+- [Modular Architecture](#modular-architecture)
 - [Language & Framework](#language--framework)
 
 ---
@@ -57,6 +66,302 @@ Complete reference of all skills in the RailsOnClaude collection.
 - Code review preparation
 - Technical debt assessment
 - Security compliance audits
+
+---
+
+### rails-code-reviewer
+
+**Path:** `skills/rails-code-reviewer/`
+
+**Description:** Automated code review focusing on SOLID principles, concurrency safety, performance patterns, and Rails best practices.
+
+**Category:** Code Quality, Code Review
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-code-reviewer
+```
+
+---
+
+### rails-dead-code-finder
+
+**Path:** `skills/rails-dead-code-finder/`
+
+**Description:** Detect and remove unused code including dead methods, orphaned files, and commented code blocks.
+
+**Category:** Code Quality, Maintenance
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-dead-code-finder
+```
+
+---
+
+## Testing
+
+### rails-test-helper
+
+**Path:** `skills/rails-test-helper/`
+
+**Description:** RSpec and testing best practices for Rails applications. Helps write effective tests, set up FactoryBot, configure test doubles, and follow TDD/BDD patterns.
+
+**Category:** Testing
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-test-helper
+```
+
+**Features:**
+- RSpec setup and configuration
+- FactoryBot patterns
+- Model, request, and integration specs
+- Test doubles and stubs
+- Shared examples and contexts
+- Four Phase Test structure
+
+---
+
+## Database & Performance
+
+### rails-db-optimizer
+
+**Path:** `skills/rails-db-optimizer/`
+
+**Description:** Database optimization including migration best practices, index optimization, query performance analysis, and database design patterns.
+
+**Category:** Performance, Database
+
+**Risk Level:** Medium
+
+**Usage:**
+```
+/rails-db-optimizer
+```
+
+**Features:**
+- Missing index detection
+- Query optimization (N+1, eager loading)
+- Migration best practices
+- Counter caches
+- Database design patterns
+
+---
+
+### rails-performance-optimizer
+
+**Path:** `skills/rails-performance-optimizer/`
+
+**Description:** Application performance optimization including caching strategies, query optimization, and Rails-specific performance patterns.
+
+**Category:** Performance
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-performance-optimizer
+```
+
+---
+
+## Security
+
+### rails-security-audit
+
+**Path:** `skills/rails-security-audit/`
+
+**Description:** Security vulnerability scanning and OWASP compliance checking for Rails applications.
+
+**Category:** Security
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-security-audit
+```
+
+---
+
+## API & Architecture
+
+### rails-api-designer
+
+**Path:** `skills/rails-api-designer/`
+
+**Description:** RESTful API design patterns, JSON API implementation, versioning strategies, and API documentation.
+
+**Category:** API Design
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-api-designer
+```
+
+---
+
+### rails-refactoring-guide
+
+**Path:** `skills/rails-refactoring-guide/`
+
+**Description:** Code refactoring patterns, SOLID principles, and architectural improvements for Rails applications.
+
+**Category:** Refactoring, Architecture
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-refactoring-guide
+```
+
+---
+
+## DevOps & Infrastructure
+
+### rails-docker
+
+**Path:** `skills/rails-docker/`
+
+**Description:** Docker and Docker Compose setup for Rails applications including production-ready configurations.
+
+**Category:** DevOps, Infrastructure
+
+**Risk Level:** Medium
+
+**Usage:**
+```
+/rails-docker
+```
+
+---
+
+### rails-dip
+
+**Path:** `skills/rails-dip/`
+
+**Description:** Dip (Docker Interaction Process) integration for simplified Docker workflows in Rails development.
+
+**Category:** DevOps, Development Tools
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-dip
+```
+
+---
+
+### rails-monitoring
+
+**Path:** `skills/rails-monitoring/`
+
+**Description:** Application monitoring setup including APM tools, log aggregation, error tracking, uptime monitoring, and performance dashboards.
+
+**Category:** Monitoring, Observability
+
+**Risk Level:** Medium
+
+**Usage:**
+```
+/rails-monitoring
+```
+
+**Features:**
+- APM setup (New Relic, Skylight, Datadog)
+- Structured logging with Lograge
+- Log aggregation (Papertrail, CloudWatch)
+- Custom metrics (StatsD, Prometheus)
+- Health check endpoints
+- Alerting configuration
+
+---
+
+## Background Jobs
+
+### rails-jobs-helper
+
+**Path:** `skills/rails-jobs-helper/`
+
+**Description:** Background job patterns with Sidekiq and Solid Queue including job design, error handling, and monitoring.
+
+**Category:** Background Jobs
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-jobs-helper
+```
+
+---
+
+## Frontend & UI
+
+### rails-turbo-stimulus
+
+**Path:** `skills/rails-turbo-stimulus/`
+
+**Description:** Hotwire integration including Turbo Frames, Turbo Streams, and Stimulus controllers for modern Rails frontend.
+
+**Category:** Frontend, Hotwire
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-turbo-stimulus
+```
+
+---
+
+## Documentation
+
+### rails-docs-generator
+
+**Path:** `skills/rails-docs-generator/`
+
+**Description:** Automated documentation generation for Rails APIs including Swagger/OpenAPI and Postman collections.
+
+**Category:** Documentation
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/rails-docs-generator
+```
+
+---
+
+## Modular Architecture
+
+### rails-packwerk
+
+**Path:** `skills/rails-packwerk/`
+
+**Description:** Shopify's Packwerk integration for modular Rails architecture and enforcing package boundaries.
+
+**Category:** Architecture, Modularity
+
+**Risk Level:** Medium
+
+**Usage:**
+```
+/rails-packwerk
+```
 
 ---
 
@@ -188,6 +493,6 @@ Each skill includes frontmatter with:
 
 ---
 
-**Total Skills:** 3
+**Total Skills:** 18
 
 **Last Updated:** 2026-04-27
