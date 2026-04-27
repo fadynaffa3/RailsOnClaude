@@ -138,20 +138,29 @@ value = port.receive
 
 **Impact:** `Set` no longer requires `require 'set'`
 
-**Search for redundant requires:**
+**Search for requires:**
 ```bash
 grep -rn "require ['\"]set['\"]" app/ lib/ --include="*.rb"
 ```
 
-**Action:**
+**⚠️ IMPORTANT - Timing:**
 ```ruby
-# ❌ Redundant in Ruby 4.0 (still works, but unnecessary)
-require "set"
+# Ruby 3.x (BEFORE upgrade) - MUST KEEP
+require "set"           # ✅ REQUIRED - removing breaks code
 Set.new([1, 2, 3])
 
-# ✅ Ruby 4.0+ (Set is core class)
-Set.new([1, 2, 3])  # No require needed
+# Ruby 4.0+ (AFTER upgrade) - Optional cleanup
+require "set"           # ✅ Still works (harmless, redundant)
+Set.new([1, 2, 3])
+
+# Or remove require (optional):
+Set.new([1, 2, 3])      # ✅ Set is core class now
 ```
+
+**Action:**
+- **DO NOT remove `require "set"` in Ruby 3.x** - it will break the code
+- **AFTER upgrading to Ruby 4.0:** Optionally remove for cleanup (purely cosmetic)
+- Keeping `require "set"` in Ruby 4.0 is perfectly fine
 
 **Deprecation:** `Set#to_set` and `Enumerable#to_set` with arguments is deprecated:
 ```bash
@@ -159,23 +168,31 @@ grep -r "\.to_set\(" app/ lib/ --include="*.rb"
 ```
 
 ```ruby
-# ⚠️ Deprecated in Ruby 4.0
+# ⚠️ Deprecated in Ruby 4.0 (will be removed in Ruby 4.1+)
 [1, 2, 3].to_set { |x| x * 2 }
 
-# ✅ Use map first
+# ✅ Fix NOW (works in Ruby 3.x and 4.0)
 [1, 2, 3].map { |x| x * 2 }.to_set
 ```
+
+**Action:** If found, fix this NOW (before upgrading) - works in both Ruby 3.x and 4.0
 
 #### Breaking Change 5: Pathname is Now a Core Class
 
 **Impact:** `Pathname` no longer requires `require 'pathname'`
 
-**Search for redundant requires:**
+**Search for requires:**
 ```bash
 grep -rn "require ['\"]pathname['\"]" app/ lib/ --include="*.rb"
 ```
 
-**Action:** Remove `require "pathname"` lines (optional cleanup).
+**⚠️ IMPORTANT - Timing:**
+- **Ruby 3.x:** Keep `require "pathname"` - REQUIRED (removing breaks code)
+- **Ruby 4.0+:** Can optionally remove `require "pathname"` - purely cosmetic
+
+**Action:** 
+- Do NOT remove before upgrading to Ruby 4.0
+- AFTER upgrading to Ruby 4.0: Optionally remove for cleanup
 
 #### Breaking Change 6: Binding#local_variables Changes
 
