@@ -1,26 +1,28 @@
 ---
 name: ruby-4-upgrade-prep
-description: Prepare Ruby on Rails applications for Ruby 4.0 upgrade. Analyzes deprecation warnings, identifies breaking changes, detects incompatible patterns, and provides migration path recommendations based on Ruby 3.x deprecations and historical upgrade patterns.
+description: Prepare Ruby on Rails applications for Ruby 4.0 upgrade. Analyzes actual breaking changes from Ruby 4.0.0 release including process creation removal, Ractor API changes, Set/Pathname core promotion, and *nil splat behavior changes.
 category: maintenance
-tags: [ruby, upgrade, migration, deprecations, future-proofing, ruby-4]
+tags: [ruby, upgrade, migration, ruby-4, breaking-changes, compatibility]
 ---
 
 # Ruby 4.0 Upgrade Preparation
 
-Prepare your Ruby on Rails application for the future Ruby 4.0 release by identifying deprecations, incompatible patterns, and potential breaking changes.
+Analyze your Ruby on Rails application for Ruby 4.0 compatibility using **actual breaking changes** from the Ruby 4.0.0 release.
+
+**Ruby 4.0.3 is now released** - Latest stable: 4.0.3
 
 ## Use this skill when
 
-- Planning Ruby 4.0 upgrade strategy
-- Future-proofing Ruby 3.x codebase
-- Identifying deprecation warnings
-- Analyzing gem compatibility risks
-- Preparing for breaking changes
+- Planning Ruby 4.0 upgrade from Ruby 3.x
+- Analyzing compatibility before upgrade
+- Identifying breaking changes in codebase
+- Checking gem compatibility with Ruby 4.0
+- Preparing migration strategy
 
 ## Do not use this skill when
 
-- Upgrading Ruby 2.x to 3.x (use existing Ruby 3 upgrade guides)
-- Fixing current Ruby 3.x bugs (use ruby-help)
+- Upgrading Ruby 2.x to 3.x (use Ruby 3 upgrade guides)
+- Fixing current Ruby bugs (use ruby-help)
 - General code refactoring (use rails-refactoring-guide)
 
 ## Instructions
@@ -34,193 +36,250 @@ rails -v
 bundle show rails
 ```
 
-**Check Gemfile.lock for Ruby version:**
+**Check Gemfile.lock:**
 ```bash
-grep "RUBY VERSION" Gemfile.lock
+grep -A 1 "RUBY VERSION" Gemfile.lock
 ```
 
-### Step 2: Analyze Deprecation Warnings
+### Step 2: Analyze Actual Ruby 4.0 Breaking Changes
 
-**Run test suite with deprecation warnings:**
+Based on official Ruby 4.0.0 changelog, check for these **actual** breaking changes:
+
+#### Breaking Change 1: `*nil` No Longer Calls `nil.to_a`
+
+**Search for `*nil` splat usage:**
 ```bash
-RUBYOPT="-W:deprecated" bundle exec rspec
-RUBYOPT="-W:deprecated" bundle exec rails test
+grep -r "\*nil" app/ lib/ --include="*.rb"
 ```
 
-**Common Ruby 3.x deprecations likely to be removed in Ruby 4.0:**
+**What changed:**
+```ruby
+# Ruby 3.x behavior
+def foo(*args); end
+foo(*nil)  # Called nil.to_a, passed empty array
 
-1. **Keyword argument separation** (enforced since Ruby 3.0)
-   ```ruby
-   # ❌ Will break in Ruby 4.0
-   def method(options)
-     # ...
-   end
-   method(key: "value")  # Passes hash, not keyword args
-   
-   # ✅ Ruby 4.0 compatible
-   def method(**options)
-     # ...
-   end
-   method(key: "value")
-   ```
+# Ruby 4.0 behavior
+foo(*nil)  # Does NOT call nil.to_a, passes nothing
+```
 
-2. **Numbered parameters with nested blocks**
-   ```ruby
-   # ⚠️ Deprecated pattern
-   array.each { |item| item.map { _1 * 2 } }  # _1 refers to outer block
-   
-   # ✅ Use explicit parameters
-   array.each { |item| item.map { |x| x * 2 } }
-   ```
+**Fix:** If you need explicit empty array, use `*[]` or `*Array(nil)`.
 
-3. **Hash#except without requiring Active Support**
-   ```ruby
-   # Ruby 3.0+ has built-in Hash#except
-   # Remove Active Support monkey patches if only using for #except
-   ```
+#### Breaking Change 2: Process Creation with `|` Removed
 
-4. **Random::DEFAULT deprecation**
-   ```ruby
-   # ⚠️ Deprecated
-   Random::DEFAULT.rand(10)
-   
-   # ✅ Use Random class directly
-   Random.rand(10)
-   ```
+**Removed features:**
+- `IO.read("|command")`
+- `IO.write("|command", data)`
+- `IO.readlines("|command")`
+- `IO.foreach("|command")`
+- `IO.binread("|command")`
+- `IO.binwrite("|command", data)`
+- `Kernel#open("|command")`
 
-5. **Refinements scope changes**
-   ```ruby
-   # ⚠️ Refinement visibility may change
-   # Document all refinement usage for review
-   ```
+**Search for removed patterns:**
+```bash
+# Find pipe-based process creation
+grep -r 'open\s*(\s*['"'"'"]|' app/ lib/ --include="*.rb"
+grep -r 'IO\.\(read\|write\|readlines\|foreach\|binread\|binwrite\)\s*(\s*['"'"'"]|' app/ lib/ --include="*.rb"
+```
+
+**Migration:**
+```ruby
+# ❌ Removed in Ruby 4.0
+IO.read("|ls -la")
+open("|git log") { |f| f.read }
+
+# ✅ Use Open3 or backticks explicitly
+require 'open3'
+stdout, stderr, status = Open3.capture3("ls -la")
+
+# Or use backticks
+`ls -la`
+
+# Or Process.spawn
+Process.spawn("ls", "-la")
+```
+
+#### Breaking Change 3: Ractor API Changes
+
+**Removed Ractor methods:**
+- `Ractor.yield` → Use `Ractor::Port` instead
+- `Ractor#take` → Use `Ractor::Port` instead
+- `Ractor#close_incoming` → Removed
+- `Ractor#close_outgoing` → Removed
+
+**New Ractor API:**
+- `Ractor::Port` class added
+- `Ractor#join` and `Ractor#value` added
+- `Ractor#default_port` added
+
+**Search for Ractor usage:**
+```bash
+grep -r "Ractor\." app/ lib/ --include="*.rb"
+grep -r "\.yield\|\.take\|close_incoming\|close_outgoing" app/ lib/ --include="*.rb" | grep -i ractor
+```
+
+**Migration:**
+```ruby
+# ❌ Old Ractor API (Ruby 3.x)
+r = Ractor.new do
+  Ractor.yield(42)
+end
+value = r.take
+
+# ✅ New Ractor API (Ruby 4.0+)
+port = Ractor::Port.new
+r = Ractor.new port do |port|
+  port << 42
+end
+value = port.receive
+```
+
+#### Breaking Change 4: Set is Now a Core Class
+
+**Impact:** `Set` no longer requires `require 'set'`
+
+**Search for redundant requires:**
+```bash
+grep -rn "require ['\"]set['\"]" app/ lib/ --include="*.rb"
+```
+
+**Action:**
+```ruby
+# ❌ Redundant in Ruby 4.0 (still works, but unnecessary)
+require "set"
+Set.new([1, 2, 3])
+
+# ✅ Ruby 4.0+ (Set is core class)
+Set.new([1, 2, 3])  # No require needed
+```
+
+**Deprecation:** `Set#to_set` and `Enumerable#to_set` with arguments is deprecated:
+```bash
+grep -r "\.to_set\(" app/ lib/ --include="*.rb"
+```
+
+```ruby
+# ⚠️ Deprecated in Ruby 4.0
+[1, 2, 3].to_set { |x| x * 2 }
+
+# ✅ Use map first
+[1, 2, 3].map { |x| x * 2 }.to_set
+```
+
+#### Breaking Change 5: Pathname is Now a Core Class
+
+**Impact:** `Pathname` no longer requires `require 'pathname'`
+
+**Search for redundant requires:**
+```bash
+grep -rn "require ['\"]pathname['\"]" app/ lib/ --include="*.rb"
+```
+
+**Action:** Remove `require "pathname"` lines (optional cleanup).
+
+#### Breaking Change 6: Binding#local_variables Changes
+
+**Impact:** `Binding#local_variables` no longer includes numbered parameters
+
+**Search for Binding usage:**
+```bash
+grep -r "Binding\." app/ lib/ --include="*.rb"
+grep -r "\.local_variables" app/ lib/ --include="*.rb"
+```
+
+**Migration:**
+```ruby
+# Ruby 3.x
+binding.local_variables  # => [:x, :y, :_1, :_2]
+
+# Ruby 4.0
+binding.local_variables           # => [:x, :y] (numbered params excluded)
+binding.implicit_parameters       # => [:_1, :_2] (new method)
+binding.implicit_parameter_get(:_1)  # Access numbered param
+```
+
+#### Breaking Change 7: TCPSocket Timeout Behavior
+
+**Impact:** `IO::TimeoutError` consistently raised instead of `Errno::ETIMEDOUT`
+
+**Search for timeout handling:**
+```bash
+grep -r "TCPSocket\|Socket\.tcp" app/ lib/ --include="*.rb"
+grep -r "ETIMEDOUT" app/ lib/ --include="*.rb"
+```
+
+**Migration:**
+```ruby
+# ❌ Old error handling
+begin
+  TCPSocket.new(host, port, open_timeout: 5)
+rescue Errno::ETIMEDOUT => e
+  # Handle timeout
+end
+
+# ✅ Consistent in Ruby 4.0
+begin
+  TCPSocket.new(host, port, open_timeout: 5)
+rescue IO::TimeoutError => e
+  # Always IO::TimeoutError now
+rescue Errno::ETIMEDOUT => e
+  # May still happen at OS level
+end
+```
+
+#### Breaking Change 8: Logical Operators Line Continuation
+
+**Impact:** `||`, `&&`, `and`, `or` at line start now continue previous line
+
+**Behavior:**
+```ruby
+# Ruby 4.0 behavior
+if condition1
+   && condition2  # Continues previous line
+  do_something
+end
+
+# Equivalent to:
+if condition1 && condition2
+  do_something
+end
+```
+
+**Action:** Most code already follows this pattern or won't be affected.
 
 ### Step 3: Check Gem Compatibility
 
-**Analyze gem dependencies:**
+**Critical gems to verify for Ruby 4.0:**
 ```bash
-bundle outdated
-bundle list
+bundle list | grep -E "(rails|mysql2|pg|puma|sidekiq|nokogiri|bootsnap)"
 ```
 
-**Critical gems to check:**
-```ruby
-# Check these gems for Ruby 4.0 compatibility announcements:
-# - rails (ensure latest 7.x or 8.x)
-# - puma
-# - sidekiq / solid_queue
-# - devise
-# - pundit / cancancan
-# - nokogiri
-# - pg / mysql2
-# - redis
-# - elasticsearch
-```
-
-**Check for deprecated gem patterns:**
+**Check for native extensions:**
 ```bash
-# Search for gems with native extensions
-bundle show --paths | xargs -I {} find {} -name "*.c" -o -name "*.so"
-
-# These may need updates for Ruby 4.0 compatibility
+bundle show --paths | xargs -I {} find {} -name "*.c" -o -name "*.so" 2>/dev/null | grep -v ".bundle"
 ```
 
-### Step 4: Pattern Analysis
+**Native extension gems will need recompilation on Ruby 4.0:**
+- mysql2
+- pg  
+- nokogiri
+- bootsnap
+- sassc
 
-**Search for deprecated patterns in codebase:**
+**Action:** `bundle install` will automatically recompile native extensions.
 
-**1. Keyword argument issues:**
+**Check gem Ruby version requirements:**
 ```bash
-# Find methods with ambiguous keyword arguments
-grep -r "def.*(\w\+)" app/ lib/ | grep -v "**"
+# Look for Ruby version constraints in gemspecs
+bundle list | while read gem ver; do
+  gem=$(echo $gem | awk '{print $2}')
+  bundle info $gem 2>/dev/null | grep "Ruby:"
+done
 ```
 
-**2. Numbered parameters in nested blocks:**
-```bash
-# Find numbered parameters (_1, _2, etc.)
-grep -r "_[0-9]" app/ lib/ --include="*.rb"
-```
+### Step 4: Generate Upgrade Readiness Report
 
-**3. Monkey patches that may conflict:**
-```bash
-# Find refinements and monkey patches
-grep -r "class <<" app/ lib/
-grep -r "refine" app/ lib/
-grep -r "\.include" config/initializers/
-```
-
-**4. String literals frozen by default:**
-```ruby
-# Ruby 3.x already has frozen string literals by default
-# Check for code that mutates strings in-place
-
-# ❌ May break
-str = "hello"
-str << " world"  # Mutates string
-
-# ✅ Ruby 4.0 compatible
-str = +"hello"  # Unfreeze explicitly
-str << " world"
-
-# Or use string concatenation
-str = "hello" + " world"
-```
-
-**5. Autocorrect with RuboCop:**
-```bash
-# Use RuboCop to detect deprecated patterns
-bundle exec rubocop --only Style/FrozenStringLiteralComment
-bundle exec rubocop --only Style/HashSyntax
-bundle exec rubocop --only Lint/DeprecatedClassMethods
-```
-
-### Step 5: ActiveRecord and Rails Patterns
-
-**Check for deprecated ActiveRecord patterns:**
-
-1. **Using `update_attribute` (bypasses validations):**
-   ```bash
-   grep -r "update_attribute" app/
-   ```
-   
-   Replace with `update_column` or `update` (with validations)
-
-2. **Dynamic finders (deprecated in Rails):**
-   ```bash
-   grep -r "find_by_\|find_all_by_\|find_or_create_by_\|find_or_initialize_by_" app/
-   ```
-   
-   Use `find_by`, `where`, `find_or_create_by`, `find_or_initialize_by`
-
-3. **`before_filter` (use `before_action`):**
-   ```bash
-   grep -r "before_filter\|after_filter\|around_filter" app/
-   ```
-
-### Step 6: Performance and Memory Patterns
-
-**Patterns likely to change in Ruby 4.0:**
-
-1. **Fiber scheduling (Async I/O):**
-   - Ruby 3.0+ has Fiber scheduler
-   - Ruby 4.0 may make Fiber-based concurrency default
-   - Audit code that assumes single-threaded execution
-
-2. **GC tuning variables:**
-   ```bash
-   # Check for GC tuning in environment files
-   grep -r "RUBY_GC" config/
-   ```
-   
-   GC tuning parameters may change in Ruby 4.0
-
-3. **Ractor usage (parallel execution):**
-   - Ractors are experimental in Ruby 3.x
-   - May become default in Ruby 4.0
-   - Audit shared state and global variables
-
-### Step 7: Generate Upgrade Readiness Report
-
-Create `RUBY_4_UPGRADE_READINESS.md`:
+Create `RUBY_4_UPGRADE_READINESS.md` with this structure:
 
 ```markdown
 # Ruby 4.0 Upgrade Readiness Report
@@ -228,376 +287,356 @@ Create `RUBY_4_UPGRADE_READINESS.md`:
 **Generated:** {{DATE}}
 **Current Ruby Version:** {{RUBY_VERSION}}
 **Current Rails Version:** {{RAILS_VERSION}}
-**Target:** Ruby 4.0 (future release)
+**Target:** Ruby 4.0.3 (Latest Stable)
+**Analysis:** Based on actual Ruby 4.0.0 breaking changes
 
 ---
 
 ## Executive Summary
 
-| Category | Status | Issues Found | Risk Level |
-|----------|--------|--------------|------------|
-| Keyword Arguments | {{STATUS}} | {{COUNT}} | {{RISK}} |
-| Deprecated Methods | {{STATUS}} | {{COUNT}} | {{RISK}} |
-| Gem Compatibility | {{STATUS}} | {{COUNT}} | {{RISK}} |
-| String Mutations | {{STATUS}} | {{COUNT}} | {{RISK}} |
-| Pattern Matching | {{STATUS}} | {{COUNT}} | {{RISK}} |
+| Breaking Change | Status | Issues Found | Risk |
+|-----------------|--------|--------------|------|
+| `*nil` Splat Behavior | {{STATUS}} | {{COUNT}} | {{RISK}} |
+| Process Creation with Pipe | {{STATUS}} | {{COUNT}} | {{RISK}} |
+| Ractor API Changes | {{STATUS}} | {{COUNT}} | {{RISK}} |
+| Set Core Class | {{STATUS}} | {{COUNT}} | Low |
+| Pathname Core Class | {{STATUS}} | {{COUNT}} | Low |
+| Binding#local_variables | {{STATUS}} | {{COUNT}} | {{RISK}} |
+| TCPSocket Timeout | {{STATUS}} | {{COUNT}} | {{RISK}} |
 
 **Overall Readiness:** {{PERCENTAGE}}%
 
 ---
 
-## 1. Deprecation Warnings
+## 1. Breaking Change Analysis
 
-### Critical (Must Fix Before Ruby 4.0)
+### `*nil` Splat Operator
+- **Files affected:** {{COUNT}}
+- **Locations:** {{FILE_PATHS}}
+- **Fix required:** {{YES/NO}}
 
-**Keyword Argument Issues:**
-- File: `app/services/foo.rb:42`
-  - Issue: Method definition uses positional hash instead of keyword arguments
-  - Fix: Change `def method(options)` to `def method(**options)`
-  - Severity: High
+### Process Creation with `|`
+- **IO.read/write/open usage:** {{COUNT}}
+- **Kernel#open with pipe:** {{COUNT}}
+- **Migration needed:** {{DETAILS}}
 
-### High Priority
+### Ractor Usage
+- **Ractor.yield/take:** {{COUNT}}
+- **Migration to Ractor::Port:** {{YES/NO}}
 
-**Numbered Parameters in Nested Blocks:**
-- File: `app/models/user.rb:87`
-  - Issue: Uses `_1` in nested block context
-  - Fix: Use explicit block parameters
-  - Severity: Medium
+### Set/Pathname Requires
+- **require "set":** {{COUNT}} files (cleanup recommended)
+- **require "pathname":** {{COUNT}} files (cleanup recommended)
 
-### Medium Priority
+### Binding Usage
+- **Binding#local_variables:** {{COUNT}}
+- **Impact:** {{DETAILS}}
 
-**String Literal Mutations:**
-- File: `lib/parser.rb:23`
-  - Issue: Mutates string literal with `<<` operator
-  - Fix: Use `+""` prefix to unfreeze or string concatenation
-  - Severity: Low
-
----
-
-## 2. Gem Compatibility Analysis
-
-### Gems Requiring Updates
-
-| Gem | Current Version | Ruby 4.0 Status | Action Required |
-|-----|----------------|-----------------|-----------------|
-| nokogiri | 1.13.0 | ⚠️ Unknown | Monitor for updates |
-| devise | 4.8.0 | ✅ Likely compatible | Test in Ruby 3.4+ |
-| sidekiq | 7.0.0 | ✅ Compatible | No action |
-
-### Gems with Native Extensions
-
-- `pg` (1.5.4) - Monitor PostgreSQL adapter compatibility
-- `mysql2` (0.5.5) - Monitor MySQL adapter compatibility
-- `bootsnap` (1.16.0) - May need recompilation
+### Socket Timeout Handling
+- **TCPSocket usage:** {{COUNT}}
+- **Errno::ETIMEDOUT rescue:** {{COUNT}}
+- **Update needed:** {{YES/NO}}
 
 ---
 
-## 3. Code Pattern Analysis
+## 2. Gem Compatibility
 
-### Patterns Needing Attention
+### Native Extension Gems
 
-**1. Method Signatures (42 instances)**
-- 12 methods with positional hash parameters
-- 8 methods with mixed positional/keyword args
-- 22 methods missing explicit keyword splat (`**`)
+| Gem | Version | Ruby 4.0 Status | Action |
+|-----|---------|-----------------|--------|
+| {{GEM}} | {{VERSION}} | {{STATUS}} | {{ACTION}} |
 
-**2. Block Patterns (15 instances)**
-- 5 uses of numbered parameters in nested contexts
-- 10 uses of `_1` where explicit params are clearer
+### Critical Dependencies
 
-**3. String Handling (8 instances)**
-- 8 in-place string mutations without explicit unfreeze
-
----
-
-## 4. Rails-Specific Issues
-
-### Deprecated Rails Patterns
-
-**Controllers:**
-- 3 uses of `before_filter` (replace with `before_action`)
-- 2 uses of `update_attribute` (replace with `update` or `update_column`)
-
-**Models:**
-- 1 dynamic finder: `find_by_email` (replace with `find_by(email:)`)
-- 5 callback chains over 3 levels (consider extraction)
-
-**Views:**
-- No deprecated patterns found ✅
+| Gem | Version | Ruby 4.0 Status | Notes |
+|-----|---------|-----------------|-------|
+| rails | {{VERSION}} | {{STATUS}} | {{NOTES}} |
+| {{...}} | {{...}} | {{...}} | {{...}} |
 
 ---
 
-## 5. Performance Considerations
+## 3. Recommended Actions
 
-### Fiber Scheduler Compatibility
-- No blocking I/O found in critical paths ✅
-- 2 synchronous HTTP calls in background jobs (consider async)
+### High Priority (Must Fix Before Upgrade)
 
-### Ractor Compatibility
-- 8 uses of global variables (not Ractor-safe)
-- 12 uses of class variables (not Ractor-safe)
+1. **{{ISSUE}}**
+   - Location: {{FILE}}:{{LINE}}
+   - Fix: {{SOLUTION}}
 
----
+### Medium Priority (Cleanup Recommended)
 
-## 6. Recommended Migration Path
+1. **Remove `require "set"`**
+   - Files: {{LIST}}
+   - Action: Delete lines
 
-### Phase 1: Immediate Actions (Pre-Ruby 4.0)
+### Low Priority (Optional)
 
-1. **Fix all deprecation warnings in Ruby 3.x**
-   ```bash
-   RUBYOPT="-W:deprecated" bundle exec rspec
-   ```
-
-2. **Update keyword argument patterns**
-   - Run: `rubocop -A --only Style/ArgumentsForwarding`
-   - Manually review 12 method signatures
-
-3. **Update gems to latest versions**
-   ```bash
-   bundle update
-   ```
-
-### Phase 2: Preparation (6 months before Ruby 4.0 release)
-
-1. **Audit gem compatibility**
-   - Check gem changelogs for Ruby 4.0 mentions
-   - Test with Ruby 4.0 preview releases
-
-2. **Refactor numbered parameters**
-   - Replace `_1` with explicit params in nested contexts
-
-3. **Add frozen string literal comments**
-   ```ruby
-   # frozen_string_literal: true
-   ```
-
-### Phase 3: Testing (Ruby 4.0 release candidate)
-
-1. **Install Ruby 4.0 RC in staging**
-   ```bash
-   rbenv install 4.0.0-rc1
-   ```
-
-2. **Run full test suite**
-   ```bash
-   bundle exec rspec
-   bundle exec rails test:system
-   ```
-
-3. **Performance benchmarking**
-   - Compare Ruby 3.x vs 4.0 performance
-   - Monitor memory usage
-   - Check GC statistics
-
-### Phase 4: Production Migration
-
-1. **Canary deployment**
-   - Deploy to 10% of servers
-   - Monitor for 48 hours
-
-2. **Gradual rollout**
-   - Increase to 50% after successful canary
-   - Monitor error rates and performance
-
-3. **Full deployment**
-   - Deploy to all servers
-   - Keep Ruby 3.x rollback plan ready
+1. **{{OPTIONAL_ITEM}}**
 
 ---
 
-## 7. Estimated Effort
+## 4. Migration Steps
 
-| Task | Estimated Hours | Priority |
-|------|----------------|----------|
-| Fix keyword arguments | 8-12 | High |
-| Update gem dependencies | 4-6 | High |
-| Refactor string mutations | 2-4 | Medium |
-| Update Rails patterns | 4-6 | Medium |
-| Testing and QA | 16-24 | High |
-| **Total** | **34-52 hours** | - |
+### Phase 1: Pre-Upgrade
+
+1. Fix all high-priority issues
+2. Update gems: `bundle update`
+3. Run tests: `bundle exec rspec`
+
+### Phase 2: Upgrade Ruby
+
+```bash
+# Using rbenv
+rbenv install 4.0.3
+rbenv local 4.0.3
+
+# Reinstall gems
+bundle install
+
+# Recompile native extensions
+bundle pristine
+```
+
+### Phase 3: Testing
+
+1. Run full test suite
+2. Check for new warnings
+3. Performance benchmarks
+
+### Phase 4: Deployment
+
+1. Deploy to staging
+2. Canary deployment (10%)
+3. Full production rollout
 
 ---
 
-## 8. Risk Assessment
+## 5. Estimated Effort
+
+| Task | Hours | Priority |
+|------|-------|----------|
+| Fix breaking changes | {{HOURS}} | High |
+| Update gems | {{HOURS}} | High |
+| Testing | {{HOURS}} | High |
+| Deployment | {{HOURS}} | Medium |
+| **Total** | **{{TOTAL}}** | - |
+
+---
+
+## 6. Risk Assessment
+
+**Overall Risk:** {{Low/Medium/High}}
 
 **High Risk Areas:**
-- Native extension gems (pg, mysql2, nokogiri)
-- Custom C extensions
-- Heavy metaprogramming code
+- {{AREA}}
 
 **Medium Risk Areas:**
-- Keyword argument patterns
-- String mutation patterns
-- Numbered parameters
+- {{AREA}}
 
 **Low Risk Areas:**
-- Standard Rails patterns
-- Well-maintained gems
-- Modern Ruby 3.x code
+- {{AREA}}
 
 ---
 
-## 9. Resources
+## 7. New Features Available in Ruby 4.0
 
-- [Ruby 4.0 Changelog](https://github.com/ruby/ruby/blob/master/NEWS.md) (when available)
+### Performance Improvements
+- Improved GC
+- Faster JIT compilation
+- Better method dispatch
+
+### New APIs
+- `Array#rfind` - efficient reverse find
+- `Enumerator.produce` with size
+- `Math.log1p`, `Math.expm1`
+- `String#strip` with selectors
+- `Kernel#inspect` control via `#instance_variables_to_inspect`
+
+### Ractor Enhancements
+- `Ractor::Port` for communication
+- `Ractor#join`, `Ractor#value`
+- Improved concurrency support
+
+---
+
+## 8. Resources
+
+- [Ruby 4.0.0 Release Notes](https://github.com/ruby/ruby/blob/master/doc/NEWS/NEWS-4.0.0.md)
+- [Ruby 4.1.0 Changelog](https://github.com/ruby/ruby/blob/master/NEWS.md)
 - [Rails Upgrade Guide](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html)
-- [RuboCop Ruby 4.0 Cops](https://docs.rubocop.org/)
 
 ---
 
-## 10. Next Steps
+## 9. Next Steps
 
-1. ✅ Review this report with team
-2. ⬜ Create Jira/Linear tickets for high-priority fixes
-3. ⬜ Schedule gem audit sprint
-4. ⬜ Set up Ruby 4.0 preview environment
-5. ⬜ Plan migration timeline
+1. ⬜ Review this report with team
+2. ⬜ Fix high-priority issues
+3. ⬜ Update gems
+4. ⬜ Test in development
+5. ⬜ Deploy to staging
+6. ⬜ Production upgrade
 
-**Recommended Start Date:** {{START_DATE}}
-**Target Completion:** {{END_DATE}}
+**Target Date:** {{DATE}}
 ```
 
-### Step 8: Continuous Monitoring
+### Step 5: Run Automated Checks
 
-**Set up deprecation tracking:**
-
-```ruby
-# config/initializers/deprecation_tracker.rb
-if Rails.env.development? || Rails.env.test?
-  ActiveSupport::Deprecation.behavior = lambda do |message, callstack, deprecation_horizon, gem_name|
-    # Log to file for analysis
-    File.open(Rails.root.join("log", "deprecations.log"), "a") do |f|
-      f.puts "[#{Time.current}] #{message}"
-      f.puts callstack.first(5).join("\n")
-      f.puts "---"
-    end
-    
-    # Also print to console
-    warn message
-  end
-end
-```
-
-**Run weekly deprecation checks:**
+**Create a check script:**
 ```bash
-# Add to CI pipeline
-RUBYOPT="-W:deprecated" bundle exec rspec > deprecations_report.txt 2>&1
+#!/bin/bash
+# ruby4_check.sh
+
+echo "=== Ruby 4.0 Compatibility Check ==="
+echo ""
+
+echo "Current Ruby version:"
+ruby -v
+echo ""
+
+echo "Checking for *nil splat:"
+grep -r "\*nil" app/ lib/ --include="*.rb" || echo "✅ None found"
+echo ""
+
+echo "Checking for pipe process creation:"
+grep -r 'IO\.\(read\|write\|readlines\|foreach\)\s*(\s*['"'"'"]|' app/ lib/ --include="*.rb" || echo "✅ None found"
+grep -r 'open\s*(\s*['"'"'"]|' app/ lib/ --include="*.rb" || echo "✅ None found"
+echo ""
+
+echo "Checking for Ractor usage:"
+grep -r "Ractor\." app/ lib/ --include="*.rb" || echo "✅ None found"
+echo ""
+
+echo "Checking for redundant requires:"
+echo "Set requires:"
+grep -rn "require ['\"]set['\"]" app/ lib/ --include="*.rb" || echo "✅ None found"
+echo "Pathname requires:"
+grep -rn "require ['\"]pathname['\"]" app/ lib/ --include="*.rb" || echo "✅ None found"
+echo ""
+
+echo "Checking for deprecated .to_set with arguments:"
+grep -r "\.to_set\(" app/ lib/ --include="*.rb" || echo "✅ None found"
+echo ""
+
+echo "Native extension gems:"
+bundle show --paths | xargs -I {} find {} -name "*.so" 2>/dev/null | head -5
+echo ""
+
+echo "=== Check Complete ==="
+```
+
+**Run the script:**
+```bash
+chmod +x ruby4_check.sh
+./ruby4_check.sh
 ```
 
 ## Best Practices
 
-### Future-Proofing Strategies
+### 1. Test Early with Ruby 4.0
 
-1. **Always use keyword arguments for options hashes:**
-   ```ruby
-   # ✅ Future-proof
-   def process(item, debug: false, verbose: false)
-     # ...
-   end
-   
-   # ❌ Avoid
-   def process(item, options = {})
-     # ...
-   end
-   ```
+```bash
+# Install Ruby 4.0 in development
+rbenv install 4.0.3
 
-2. **Avoid numbered parameters in complex contexts:**
-   ```ruby
-   # ✅ Clear and maintainable
-   users.map { |user| user.posts.map { |post| post.title } }
-   
-   # ❌ Confusing with nested blocks
-   users.map { _1.posts.map { _1.title } }  # Which _1?
-   ```
+# Create test branch
+git checkout -b ruby-4-0-test
 
-3. **Use frozen string literal comment:**
-   ```ruby
-   # frozen_string_literal: true
-   
-   # At top of every file
-   ```
+# Update .ruby-version
+echo "4.0.3" > .ruby-version
 
-4. **Prefer modern Ruby syntax:**
-   ```ruby
-   # ✅ Modern Ruby 3.x syntax (likely Ruby 4.0 compatible)
-   def calculate(amount:, rate:) = amount * rate
-   
-   case user
-   in { role: "admin", active: true }
-     grant_access
-   in { role: "user" }
-     limited_access
-   end
-   ```
+# Bundle install
+bundle install
 
-5. **Keep gems up to date:**
-   ```bash
-   # Run monthly
-   bundle update --conservative
-   ```
+# Run tests
+RUBYOPT="-W" bundle exec rspec
+```
 
-### Testing Strategy
+### 2. Gradual Migration
 
-1. **Add Ruby 4.0 to CI matrix (when available):**
-   ```yaml
-   # .github/workflows/test.yml
-   strategy:
-     matrix:
-       ruby: ['3.3', '3.4', '4.0-preview']
-       rails: ['7.1', '7.2', '8.0']
-   ```
+- Test in development first
+- Deploy to staging
+- Canary deployment in production
+- Monitor metrics closely
+- Keep rollback plan ready
 
-2. **Run deprecation checks in CI:**
-   ```yaml
-   - name: Check for deprecations
-     run: |
-       RUBYOPT="-W:deprecated" bundle exec rspec 2>&1 | tee deprecations.log
-       if grep -q "deprecated" deprecations.log; then
-         echo "::warning::Deprecation warnings found"
-       fi
-   ```
+### 3. Monitor Performance
+
+Ruby 4.0 has performance improvements:
+- 5-15% faster in benchmarks
+- Better GC behavior
+- Improved JIT
+
+**Benchmark before and after:**
+```ruby
+require 'benchmark/ips'
+
+Benchmark.ips do |x|
+  x.report("your_method") { YourClass.your_method }
+end
+```
+
+### 4. Keep Gems Updated
+
+```bash
+# Check for outdated gems
+bundle outdated
+
+# Update conservatively
+bundle update --conservative
+
+# Or update all
+bundle update
+```
 
 ## Common Mistakes to Avoid
 
-- ❌ Ignoring deprecation warnings in Ruby 3.x
-- ❌ Using outdated gems that may not support Ruby 4.0
-- ❌ Mutating frozen string literals without unfreezing
-- ❌ Mixing positional and keyword arguments
-- ❌ Using numbered parameters in nested blocks
-- ❌ Assuming Ruby 4.0 will have same performance characteristics
-- ❌ Not testing with Ruby 4.0 preview releases
-- ❌ Upgrading gems and Ruby version simultaneously
-- ❌ Skipping load testing after upgrade
-
-## Historical Context
-
-**Lessons from Ruby 2.7 → 3.0 upgrade:**
-
-- Keyword argument separation was the biggest breaking change
-- Gems with native extensions had compatibility issues
-- Performance characteristics changed (GC improvements)
-- Some gems took 6-12 months to become Ruby 3.0 compatible
-
-**Expected Ruby 4.0 changes (speculation based on Ruby evolution):**
-
-- Stricter frozen string literals (possibly enabled by default)
-- Fiber scheduler as default for I/O operations
-- Ractor improvements and potential default parallel execution
-- Continued focus on performance (faster JIT, improved GC)
-- Removal of long-deprecated features from Ruby 2.x era
-- Type annotation support (possibly RBS integration)
+- ❌ Assuming no changes needed without checking
+- ❌ Not testing with actual Ruby 4.0
+- ❌ Upgrading gems and Ruby simultaneously
+- ❌ Skipping staging deployment
+- ❌ Not monitoring after upgrade
+- ❌ Ignoring native extension recompilation
+- ❌ Not having rollback plan
+- ❌ Rushing production deployment
 
 ## Verification Checklist
 
-Before marking Ruby 4.0 upgrade readiness complete:
+Before declaring Ruby 4.0 readiness:
 
-- [ ] All deprecation warnings resolved
-- [ ] Test suite passes with `RUBYOPT="-W:deprecated"`
-- [ ] All gems updated to latest versions
-- [ ] Native extension gems recompiled successfully
-- [ ] Keyword arguments audited and fixed
-- [ ] String mutation patterns refactored
-- [ ] Performance benchmarks show acceptable results
-- [ ] Load testing completed in staging environment
-- [ ] Rollback plan documented and tested
-- [ ] Team trained on Ruby 4.0 changes
+- [ ] No `*nil` usage found
+- [ ] No pipe-based process creation
+- [ ] No old Ractor API usage
+- [ ] `require "set"` cleanup complete (optional)
+- [ ] `require "pathname"` cleanup complete (optional)
+- [ ] All tests pass on Ruby 4.0
+- [ ] No deprecation warnings
+- [ ] Gem compatibility verified
+- [ ] Native extensions recompiled
+- [ ] Performance benchmarks acceptable
+- [ ] Staging deployment successful
+- [ ] Rollback plan tested
+- [ ] Team trained on changes
+
+## Historical Context
+
+**Ruby 3.0 → 4.0 is a smaller jump than 2.7 → 3.0:**
+
+- Keyword argument separation was the biggest Ruby 3.0 change
+- Ruby 4.0 removes long-deprecated features
+- Most breaking changes affect edge cases
+- Well-maintained gems already Ruby 4.0 compatible
+
+**Expected Ruby 4.0 adoption:**
+- Rails 8.x fully supports Ruby 4.0
+- Major gems updated quickly
+- Production adoption ramping up
+
+## Support
+
+If you encounter issues:
+
+1. Check [Ruby Issue Tracker](https://bugs.ruby-lang.org)
+2. Review [Rails Upgrading Guide](https://guides.rubyonrails.org/upgrading_ruby_on_rails.html)
+3. Search GitHub issues for your gems
+4. Ask on Ruby Discord/Forums
