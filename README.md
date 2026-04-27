@@ -68,7 +68,7 @@ This collection includes battle-tested skills for:
 
 ### Code Quality & Auditing
 
-- **[rails-audit](skills/rails-audit/)** - Comprehensive code audits with test coverage, security, and quality metrics
+- **[rails-audit](skills/rails-audit/SKILL.md)** - Comprehensive code audits with test coverage, security, and quality metrics
   - RSpec test coverage analysis with SimpleCov
   - Code complexity metrics with RubyCritic
   - Security vulnerability detection
@@ -79,13 +79,13 @@ This collection includes battle-tested skills for:
 
 ### Language & Framework Expertise
 
-- **[ruby-help](skills/ruby-help/)** - Idiomatic Ruby with metaprogramming and performance optimization
+- **[ruby-help](skills/ruby-help/SKILL.md)** - Idiomatic Ruby with metaprogramming and performance optimization
   - Ruby 3.x features and patterns
   - Metaprogramming and DSL design
   - Gem development and versioning
   - RSpec/Minitest testing patterns
 
-- **[rails-help](skills/rails-help/)** - Rails conventions and MVC best practices
+- **[rails-help](skills/rails-help/SKILL.md)** - Rails conventions and MVC best practices
   - ActiveRecord patterns and optimization
   - Hotwire (Turbo + Stimulus) integration
   - Strong parameters and security
@@ -97,15 +97,22 @@ Pre-configured skill sets for common Rails development roles:
 
 ### Rails Backend Developer
 ```bash
-cp -r bundles/rails-backend-dev/* ~/.claude/skills/
+# Install all three skills
+cp -r skills/rails-help ~/.claude/skills/
+cp -r skills/ruby-help ~/.claude/skills/
+cp -r skills/rails-audit ~/.claude/skills/
 ```
 Includes: `rails-help`, `ruby-help`, `rails-audit`
 
 ### Rails Code Auditor
 ```bash
-cp -r bundles/rails-auditor/* ~/.claude/skills/
+# Install audit skills
+cp -r skills/rails-audit ~/.claude/skills/
+cp -r skills/ruby-help ~/.claude/skills/
 ```
 Includes: `rails-audit`, `ruby-help` - comprehensive code quality and security analysis
+
+See [bundles/rails-auditor](bundles/rails-auditor/README.md) for more details.
 
 ## 🔄 Common Workflows
 
