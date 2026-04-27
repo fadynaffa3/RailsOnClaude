@@ -14,6 +14,7 @@ Complete reference of all skills in the RailsOnClaude collection.
 - [Frontend & UI](#frontend--ui)
 - [Documentation](#documentation)
 - [Modular Architecture](#modular-architecture)
+- [Upgrades & Maintenance](#upgrades--maintenance)
 - [Language & Framework](#language--framework)
 
 ---
@@ -365,6 +366,53 @@ Complete reference of all skills in the RailsOnClaude collection.
 
 ---
 
+## Upgrades & Maintenance
+
+### ruby-4-upgrade-prep
+
+**Path:** `skills/ruby-4-upgrade-prep/`
+
+**Description:** Prepare Ruby on Rails applications for Ruby 4.0 upgrade. Analyzes deprecation warnings, identifies breaking changes, detects incompatible patterns, and provides migration path recommendations based on Ruby 3.x deprecations and historical upgrade patterns.
+
+**Category:** Upgrades, Maintenance
+
+**Risk Level:** Low
+
+**Usage:**
+```
+/ruby-4-upgrade-prep
+```
+
+**Features:**
+- Deprecation warning analysis with RUBYOPT
+- Keyword argument pattern detection
+- Gem compatibility checking
+- String mutation pattern analysis
+- Numbered parameter detection in nested blocks
+- ActiveRecord deprecated pattern scanning
+- Native extension gem identification
+- Performance and memory pattern auditing
+- Comprehensive upgrade readiness report generation
+
+**Output:** Generates `RUBY_4_UPGRADE_READINESS.md` with:
+- Executive summary with readiness percentage
+- Deprecation warnings categorized by severity
+- Gem compatibility matrix
+- Code pattern analysis
+- Rails-specific issues
+- Performance considerations (Fiber, Ractor)
+- Phased migration path (4 phases)
+- Estimated effort and risk assessment
+
+**When to Use:**
+- Planning Ruby 4.0 upgrade strategy
+- Future-proofing Ruby 3.x codebase
+- Identifying deprecation warnings
+- Analyzing gem compatibility risks
+- Preparing for breaking changes
+
+---
+
 ## Language & Framework
 
 ### ruby-help
@@ -493,6 +541,6 @@ Each skill includes frontmatter with:
 
 ---
 
-**Total Skills:** 18
+**Total Skills:** 19
 
 **Last Updated:** 2026-04-27

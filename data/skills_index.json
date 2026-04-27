@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "last_updated": "2026-04-27",
-  "total_skills": 18,
+  "total_skills": 19,
   "skills": [
     {
       "name": "rails-audit",
@@ -146,6 +146,14 @@
       "category": "framework-expertise",
       "tags": ["rails", "mvc", "activerecord", "hotwire", "security"],
       "risk": "low"
+    },
+    {
+      "name": "ruby-4-upgrade-prep",
+      "path": "skills/ruby-4-upgrade-prep",
+      "description": "Prepare Ruby on Rails applications for Ruby 4.0 upgrade by analyzing deprecation warnings, identifying breaking changes, checking gem compatibility, and providing migration path recommendations.",
+      "category": "maintenance",
+      "tags": ["ruby", "upgrade", "migration", "deprecations", "future-proofing", "ruby-4"],
+      "risk": "low"
     }
   ],
   "categories": {
@@ -196,6 +204,10 @@
     "framework-expertise": {
       "name": "Framework Expertise",
       "skills": ["rails-help"]
+    },
+    "maintenance": {
+      "name": "Upgrades & Maintenance",
+      "skills": ["ruby-4-upgrade-prep"]
     }
   },
   "bundles": [

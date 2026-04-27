@@ -1,6 +1,6 @@
 # RailsOnClaude 🛤️
 
-> A curated collection of 18 AI assistant skills for Ruby on Rails development with Claude Code, Cursor, and other AI coding tools.
+> A curated collection of 19 AI assistant skills for Ruby on Rails development with Claude Code, Cursor, and other AI coding tools.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -81,6 +81,9 @@ cp -r skills/rails-help ~/.claude/skills/
 /rails-packwerk                  # Modular architecture with Packwerk
 /rails-refactoring-guide         # Code refactoring patterns
 
+# Upgrades & Maintenance
+/ruby-4-upgrade-prep             # Prepare for Ruby 4.0 upgrade
+
 # Language Expertise
 /ruby-help                       # Ruby idioms and metaprogramming
 /rails-help                      # Rails conventions and best practices
@@ -88,7 +91,7 @@ cp -r skills/rails-help ~/.claude/skills/
 
 ## 📦 What's Inside
 
-This collection includes 18 battle-tested skills organized into 11 categories:
+This collection includes 19 battle-tested skills organized into 12 categories:
 
 - **Code Quality & Auditing** (3) - Comprehensive audits, automated code review, dead code detection
 - **Testing** (1) - RSpec/Minitest patterns, FactoryBot, test coverage analysis
@@ -100,11 +103,12 @@ This collection includes 18 battle-tested skills organized into 11 categories:
 - **Frontend & UI** (1) - Hotwire (Turbo + Stimulus) integration
 - **Documentation** (1) - Automated API docs with Swagger/OpenAPI
 - **Modular Architecture** (1) - Packwerk for enforcing package boundaries
+- **Upgrades & Maintenance** (1) - Ruby 4.0 upgrade preparation and deprecation analysis
 - **Language Expertise** (2) - Ruby idioms, Rails conventions, metaprogramming
 
 **5 Pre-configured Bundles**: Backend Dev, Code Auditor, DevOps, API Developer, Performance Engineer
 
-## 🎯 Skills Catalog (18 Total)
+## 🎯 Skills Catalog (19 Total)
 
 ### Code Quality & Auditing (3 skills)
 
@@ -157,6 +161,10 @@ This collection includes 18 battle-tested skills organized into 11 categories:
 ### Modular Architecture (1 skill)
 
 - **[rails-packwerk](skills/rails-packwerk/SKILL.md)** - Shopify's Packwerk integration for modular Rails architecture. Enforce package boundaries, privacy violations, dependency constraints, and gradual migration to domain-driven design.
+
+### Upgrades & Maintenance (1 skill)
+
+- **[ruby-4-upgrade-prep](skills/ruby-4-upgrade-prep/SKILL.md)** - Prepare Rails applications for Ruby 4.0 upgrade by analyzing deprecation warnings, identifying breaking changes, checking gem compatibility, detecting incompatible patterns, and generating comprehensive upgrade readiness reports with migration path recommendations.
 
 ### Language Expertise (2 skills)
 
