@@ -107,8 +107,6 @@ cp -r bundles/rails-auditor/* ~/.claude/skills/
 ```
 Includes: `rails-audit`, `ruby-help` - comprehensive code quality and security analysis
 
-See [bundles documentation](docs/users/bundles.md) for all available bundles.
-
 ## 🔄 Common Workflows
 
 Step-by-step playbooks for common Rails tasks:
@@ -116,21 +114,13 @@ Step-by-step playbooks for common Rails tasks:
 - **[New Rails Project Setup](workflows/new-project-setup.md)** - Initialize a production-ready Rails app
 - **[Code Quality Audit](workflows/code-audit.md)** - Run comprehensive code review
 
-See [workflows documentation](docs/users/workflows.md) for complete catalog.
-
 ## 📚 Documentation
 
-### For Users
-- [Installation Guide](docs/users/installation.md)
-- [Skill Bundles](docs/users/bundles.md)
-- [Workflows](docs/users/workflows.md)
-- [Claude Code Integration](docs/users/claude-code-skills.md)
-- [Cursor Integration](docs/users/cursor-skills.md)
-
-### For Contributors
-- [Contributing Guide](docs/contributors/CONTRIBUTING.md)
-- [Skill Development](docs/contributors/skill-development.md)
-- [Testing Skills](docs/contributors/testing.md)
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute new skills
+- **[Testing Guide](TESTING.md)** - How to test skills locally
+- **[Publishing Guide](PUBLISHING.md)** - How to publish your own skills
+- **[Skills Catalog](CATALOG.md)** - Complete reference of all skills
+- **[Next Steps](NEXT_STEPS.md)** - Post-publishing guide
 
 ## 🔧 Tool Compatibility
 
@@ -191,7 +181,7 @@ Browse the complete skill catalog:
 
 ## 🤝 Contributing
 
-We welcome contributions! See our [Contributing Guide](docs/contributors/CONTRIBUTING.md) for:
+We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md) for:
 - How to add new skills
 - Skill quality standards
 - Testing requirements
@@ -210,7 +200,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - 🐛 [Report Issues](https://github.com/fadynaffa3/RailsOnClaude/issues)
 - 💡 [Request Features](https://github.com/fadynaffa3/RailsOnClaude/issues/new)
-- 💬 [Discussions](https://github.com/fadynaffa3/RailsOnClaude/discussions)
+- 📖 [View Documentation](https://github.com/fadynaffa3/RailsOnClaude#readme)
 
 ---
 
