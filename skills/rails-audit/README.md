@@ -1,22 +1,13 @@
-# Rails Audit Skill (thoughtbot Best Practices)
+# Rails Audit Skill
 
-A [Claude Code][claude-code] skill that performs comprehensive code audits of
-Ruby on Rails applications based on [thoughtbot's][thoughtbot] Ruby Science and
-Testing Rails best practices.
+Comprehensive code audits for Ruby on Rails applications inspired by and based on thoughtbot's best practices.
 
-[claude-code]: https://docs.anthropic.com/en/docs/claude-code
-[thoughtbot]: https://thoughtbot.com
+**Methodology References:**
+- [thoughtbot's Ruby Science](https://github.com/thoughtbot/ruby-science) - Code smell detection
+- [thoughtbot's Testing Rails](https://github.com/thoughtbot/testing-rails) - Testing best practices
+- [Rails Antipatterns](https://www.informit.com/store/rails-antipatterns-best-practice-ruby-on-rails-refactoring-9780321604811) - Refactoring patterns
 
-## Quick links
-
-- **[Ruby Science][ruby-science]** - thoughtbot's guide to fixing code smells
-- **[Testing Rails][testing-rails]** - thoughtbot's guide to testing Rails applications
-- **[Rails Antipatterns][rails-antipatterns]** - Best practices for Ruby on 
-  Rails refactoring (Chad Pytel & Tammer Saleh)
-
-[ruby-science]: https://github.com/thoughtbot/ruby-science
-[testing-rails]: https://github.com/thoughtbot/testing-rails
-[rails-antipatterns]: https://www.informit.com/store/rails-antipatterns-best-practice-ruby-on-rails-refactoring-9780321604811
+This skill applies proven methodologies from these excellent resources.
 
 ## Table of contents
 
@@ -54,13 +45,14 @@ covering:
 Copy the skill directory to your Claude Code skills folder:
 
 ```bash
-cp -r rails-audit-thoughtbot ~/.claude/skills/
+cp -r rails-audit ~/.claude/skills/
 ```
 
-Or clone directly:
+Or install from the RailsOnClaude repository:
 
 ```bash
-git clone https://github.com/thoughtbot/rails-audit-thoughtbot ~/.claude/skills/rails-audit-thoughtbot
+git clone https://github.com/fadynaffa3/RailsOnClaude
+cp -r RailsOnClaude/skills/rails-audit ~/.claude/skills/
 ```
 
 ## Usage
@@ -78,7 +70,7 @@ claude audit
 If you are in a Claude session, you can reference the skill directly:
 
 ```
-/rails-audit-thoughtbot
+/rails-audit
 ```
 
 ### Targeted audit
@@ -86,7 +78,7 @@ If you are in a Claude session, you can reference the skill directly:
 In a Claude session you can also run targeted audits:
 
 ```
-/rails-audit-thoughtbot audit controllers
+/rails-audit audit controllers
 ```
 
 This focuses the audit on specific files or directories.
@@ -157,19 +149,12 @@ new detection rules:
 
 This skill is open source and available under the [MIT License](LICENSE).
 
-## About thoughtbot
+## Acknowledgments
 
-![thoughtbot](https://thoughtbot.com/thoughtbot-logo-for-readmes.svg)
+This skill's methodology is inspired by and based on thoughtbot's excellent guides:
 
-This skill is inspired by and based on thoughtbot's excellent guides:
-
-- [Ruby Science](https://github.com/thoughtbot/ruby-science)
-- [Testing Rails](https://github.com/thoughtbot/testing-rails)
+- [Ruby Science](https://github.com/thoughtbot/ruby-science) - Code smell detection
+- [Testing Rails](https://github.com/thoughtbot/testing-rails) - Testing best practices
 - [Rails Antipatterns](https://www.informit.com/store/rails-antipatterns-best-practice-ruby-on-rails-refactoring-9780321604811) by Chad Pytel & Tammer Saleh
 
-The names and logos for thoughtbot are trademarks of thoughtbot, inc.
-
-We love open source software!
-See [thoughtbot's other projects][community].
-
-[community]: https://thoughtbot.com/community?utm_source=github
+We've adapted and extended these methodologies to create a comprehensive audit skill for modern Rails applications.

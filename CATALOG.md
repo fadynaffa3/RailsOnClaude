@@ -15,7 +15,7 @@ Complete reference of all skills in the RailsOnClaude collection.
 
 **Path:** `skills/rails-audit/`
 
-**Description:** Perform comprehensive code audits of Ruby on Rails applications based on thoughtbot best practices. Analyzes testing practices (RSpec), security vulnerabilities, code design (skinny controllers, domain models, PORO), Rails conventions, database optimization, and Ruby best practices.
+**Description:** Perform comprehensive code audits of Ruby on Rails applications. Analyzes testing practices (RSpec), security vulnerabilities, code design (skinny controllers, domain models, PORO), Rails conventions, database optimization, and Ruby best practices. Methodology inspired by industry-proven Rails development patterns.
 
 **Category:** Code Quality, Testing, Security
 
