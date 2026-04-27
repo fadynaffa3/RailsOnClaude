@@ -1,0 +1,121 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-04-27",
+  "total_skills": 3,
+  "skills": [
+    {
+      "name": "rails-audit",
+      "path": "skills/rails-audit",
+      "description": "Comprehensive code audit for Ruby on Rails applications covering testing, security, architecture, performance, Ruby idioms, Rails conventions, and code quality. Analyzes RSpec/Minitest tests, security vulnerabilities (SQL injection, XSS, mass assignment), code design (PORO patterns, SOLID principles), ActiveRecord optimization, N+1 queries, metaprogramming patterns, and database design. Outputs detailed audit report with automated metrics from SimpleCov (coverage) and RubyCritic (complexity). Severity-ranked findings (Critical, High, Medium, Low) with actionable refactoring recommendations.",
+      "category": "code-quality",
+      "tags": ["audit", "testing", "security", "rspec", "code-review", "quality", "ruby", "rails"],
+      "risk": "low",
+      "features": [
+        "Test coverage analysis with SimpleCov",
+        "Code complexity metrics with RubyCritic",
+        "Security vulnerability detection",
+        "Ruby idioms and best practices analysis",
+        "Rails conventions compliance checking",
+        "Fat model/controller detection",
+        "PORO refactoring recommendations",
+        "N+1 query detection",
+        "Law of Demeter violations",
+        "Metaprogramming patterns analysis",
+        "Performance optimization opportunities"
+      ],
+      "output": "RAILS_AUDIT_REPORT.md",
+      "subagents": ["simplecov_agent", "rubycritic_agent"],
+      "references": [
+        "code_smells.md",
+        "testing_guidelines.md",
+        "poro_patterns.md",
+        "security_checklist.md",
+        "rails_antipatterns.md",
+        "ruby_idioms.md",
+        "rails_conventions.md",
+        "report_template.md"
+      ]
+    },
+    {
+      "name": "ruby-help",
+      "path": "skills/ruby-help",
+      "description": "Expert guidance for writing idiomatic Ruby code with metaprogramming, Rails patterns, and performance optimization. Specializes in gem development and testing frameworks.",
+      "category": "language-expertise",
+      "tags": ["ruby", "metaprogramming", "performance", "gems", "testing", "rspec", "minitest"],
+      "risk": "low",
+      "features": [
+        "Ruby 3.x modern syntax and features",
+        "Metaprogramming patterns (modules, mixins, DSLs)",
+        "Gem development and versioning",
+        "Performance optimization and profiling",
+        "RSpec and Minitest testing patterns",
+        "RuboCop integration",
+        "Block and enumerable patterns",
+        "Exception handling best practices"
+      ],
+      "focus_areas": [
+        "Clean, maintainable Ruby code",
+        "Ruby expressiveness and idioms",
+        "Performance benchmarking",
+        "Static analysis integration"
+      ]
+    },
+    {
+      "name": "rails-help",
+      "path": "skills/rails-help",
+      "description": "Expert in Ruby on Rails development with conventions and best practices for MVC architecture, ActiveRecord, Hotwire, security, and testing.",
+      "category": "framework-expertise",
+      "tags": ["rails", "mvc", "activerecord", "hotwire", "security", "testing", "performance"],
+      "risk": "low",
+      "features": [
+        "Rails conventions (Convention over Configuration)",
+        "ActiveRecord patterns and optimization",
+        "N+1 query prevention with eager loading",
+        "Fragment and Russian Doll caching",
+        "Service objects for business logic",
+        "Hotwire (Turbo + Stimulus) integration",
+        "ViewComponents for reusable UI",
+        "Strong parameters and CSRF protection",
+        "RESTful routing patterns"
+      ],
+      "architecture": [
+        "Thin controllers, fat models (with limits)",
+        "Concerns for shared functionality",
+        "Background jobs (Sidekiq/ActiveJob)",
+        "RESTful routing conventions"
+      ],
+      "testing": [
+        "RSpec/Minitest with TDD",
+        "FactoryBot for test data",
+        "Mocking external services",
+        "Shared examples for DRY tests"
+      ]
+    }
+  ],
+  "categories": {
+    "code-quality": {
+      "name": "Code Quality & Auditing",
+      "skills": ["rails-audit"]
+    },
+    "language-expertise": {
+      "name": "Language Expertise",
+      "skills": ["ruby-help"]
+    },
+    "framework-expertise": {
+      "name": "Framework Expertise",
+      "skills": ["rails-help"]
+    }
+  },
+  "bundles": [
+    {
+      "name": "rails-backend-dev",
+      "description": "Essential skills for Ruby on Rails backend development",
+      "skills": ["rails-help", "ruby-help", "rails-audit"]
+    },
+    {
+      "name": "rails-auditor",
+      "description": "Code audit and quality assurance skills",
+      "skills": ["rails-audit", "ruby-help"]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "name": "RailsOnClaude",
+  "version": "1.0.0",
+  "description": "Curated collection of AI assistant skills for Ruby on Rails development",
+  "keywords": [
+    "rails",
+    "ruby",
+    "claude-code",
+    "cursor",
+    "ai-assistant",
+    "skills",
+    "code-quality",
+    "testing",
+    "security"
+  ],
+  "author": "Fady Naffa",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fadynaffa3/RailsOnClaude.git"
+  },
+  "homepage": "https://github.com/fadynaffa3/RailsOnClaude#readme",
+  "bugs": {
+    "url": "https://github.com/fadynaffa3/RailsOnClaude/issues"
+  },
+  "skills": [
+    "skills/rails-audit",
+    "skills/ruby-help",
+    "skills/rails-help"
+  ]
+}
