@@ -518,7 +518,7 @@ end
 class AddAndUpdateStatus < ActiveRecord::Migration[7.1]
   def change
     add_column :orders, :status, :string
-    
+
     Order.all.each do |order| # Don't do this!
       order.update(status: order.paid? ? 'completed' : 'pending')
     end
@@ -605,7 +605,7 @@ class OrdersController < ApplicationController
 
   def create
     @order = Orders::CreateService.call(user: current_user, params: order_params)
-    
+
     if @order.success?
       render json: @order.value, status: :created
     else
@@ -662,7 +662,7 @@ class Orders::CreateService
   end
 
   private
-  
+
   # Implementation
 end
 
@@ -729,14 +729,14 @@ This would make it easier to test and reuse.
 This is wrong. You should use a scope.
 
 # Good: Asking questions
-❓ Have you considered the case where the user is nil? 
+❓ Have you considered the case where the user is nil?
 This might raise an error.
 
 # Bad: Unclear
 This might break.
 
 # Good: Approving with suggestions
-✅ LGTM! One suggestion: consider adding a database index on 
+✅ LGTM! One suggestion: consider adding a database index on
 `users.email` for better query performance. Not blocking.
 
 # Bad: Nitpicking

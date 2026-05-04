@@ -50,16 +50,16 @@ class OrdersController < ApplicationController
     @order = Order.new(order_params)
     @order.user_id = current_user.id
     @order.total = calculate_total(@order.items)
-    
+
     if @order.save
       @order.items.each do |item|
         item.update(status: "ordered")
         InventoryItem.find_by(product_id: item.product_id).decrement!(:quantity)
       end
-      
+
       OrderMailer.confirmation(@order).deliver_later
       NotificationService.notify_admin(@order)
-      
+
       render json: @order, status: :created
     else
       render json: @order.errors, status: :unprocessable_entity
@@ -71,7 +71,7 @@ end
 class OrdersController < ApplicationController
   def create
     result = Orders::Create.call(params: order_params, user: current_user)
-    
+
     if result.success?
       render json: result.order, status: :created
     else
@@ -107,12 +107,12 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     authorize @post
   end
-  
+
   def edit
     @post = Post.find(params[:id])
     authorize @post
   end
-  
+
   def update
     @post = Post.find(params[:id])
     authorize @post
@@ -124,13 +124,13 @@ end
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :edit, :update, :destroy]
   before_action :authorize_post, only: [:edit, :update, :destroy]
-  
+
   private
-  
+
   def set_post
     @post = Post.find(params[:id])
   end
-  
+
   def authorize_post
     authorize @post
   end
@@ -162,7 +162,7 @@ end
 # Bad - validation in controller
 def create
   @user = User.new(user_params)
-  
+
   if @user.email.present? && @user.email.include?("@")
     @user.save
   else
@@ -188,7 +188,7 @@ class Order < ApplicationRecord
   after_create :create_invoice
   after_create :charge_payment
   after_create :update_analytics
-  
+
   # 6 callbacks - hard to debug, order-dependent, slow
 end
 
@@ -197,17 +197,17 @@ class Orders::Create
   def call(params:, user:)
     Order.transaction do
       order = Order.create!(params.merge(user: user))
-      
+
       # Explicit steps
       charge_payment(order)
       update_inventory(order)
       create_invoice(order)
-      
+
       # Background jobs for non-critical tasks
       OrderMailer.confirmation(order).deliver_later
       NotifyAdminJob.perform_later(order.id)
       AnalyticsJob.perform_later("order.created", order.id)
-      
+
       order
     end
   end
@@ -219,11 +219,11 @@ end
 # Bad - duplicated code in models
 class Post < ApplicationRecord
   belongs_to :user
-  
+
   def archive!
     update!(archived_at: Time.current)
   end
-  
+
   def archived?
     archived_at.present?
   end
@@ -233,7 +233,7 @@ class Comment < ApplicationRecord
   def archive!
     update!(archived_at: Time.current)
   end
-  
+
   def archived?
     archived_at.present?
   end
@@ -242,16 +242,16 @@ end
 # Good - extract to concern
 module Archivable
   extend ActiveSupport::Concern
-  
+
   included do
     scope :archived, -> { where.not(archived_at: nil) }
     scope :active, -> { where(archived_at: nil) }
   end
-  
+
   def archive!
     update!(archived_at: Time.current)
   end
-  
+
   def archived?
     archived_at.present?
   end
@@ -276,18 +276,18 @@ def create
   UserMailer.welcome(@user).deliver_now  # Blocks request
   SlackNotifier.notify_team(@user)       # Blocks request
   AnalyticsService.track(@user)          # Blocks request
-  
+
   render json: @user
 end
 
 # Good - async jobs
 def create
   @user = User.create!(user_params)
-  
+
   UserMailer.welcome(@user).deliver_later
   NotifyTeamJob.perform_later(@user.id)
   TrackAnalyticsJob.perform_later("user.created", @user.id)
-  
+
   render json: @user
 end
 ```
@@ -304,7 +304,7 @@ end
 # Russian Doll caching
 <% cache @post do %>
   <%= render @post %>
-  
+
   <% cache @post.comments do %>
     <%= render @post.comments %>
   <% end %>
@@ -420,14 +420,14 @@ it "publishes the post" do
   # Setup
   user = create(:user)
   post = create(:post, user: user, status: "draft")
-  
+
   # Exercise
   post.publish
-  
+
   # Verify
   expect(post).to be_published
   expect(post.published_at).to be_present
-  
+
   # (Teardown handled by database_cleaner)
 end
 ```
@@ -439,13 +439,13 @@ end
 john:
   name: John Doe
   email: john@example.com
-  
+
 # Good - factories with explicit relationships
 FactoryBot.define do
   factory :user do
     name { Faker::Name.name }
     email { Faker::Internet.email }
-    
+
     trait :admin do
       role { "admin" }
     end
@@ -487,7 +487,7 @@ User.where(email: params[:email])
 # Ensure in ApplicationController
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
-  
+
   # Or for API-only
   protect_from_forgery with: :null_session
 end

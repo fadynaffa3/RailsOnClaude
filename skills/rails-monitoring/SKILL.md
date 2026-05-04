@@ -62,19 +62,19 @@ common: &default_settings
   app_name: <%= ENV['NEW_RELIC_APP_NAME'] || 'My Rails App' %>
   monitor_mode: true
   log_level: info
-  
+
   # Transaction tracing
   transaction_tracer:
     enabled: true
     transaction_threshold: apdex_f
     record_sql: obfuscated
     stack_trace_threshold: 0.5
-  
+
   # Error collection
   error_collector:
     enabled: true
     ignore_errors: "ActionController::RoutingError"
-  
+
   # Browser monitoring
   browser_monitoring:
     auto_instrument: true
@@ -102,7 +102,7 @@ authentication: <%= ENV['SKYLIGHT_AUTHENTICATION'] %>
 # Instrument specific methods
 class UserService
   include NewRelic::Agent::Instrumentation::ControllerInstrumentation
-  
+
   def process_order(order)
     # Business logic
   end
@@ -131,7 +131,7 @@ gem 'lograge'
 Rails.application.configure do
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Json.new
-  
+
   config.lograge.custom_options = lambda do |event|
     {
       time: event.time,
@@ -140,7 +140,7 @@ Rails.application.configure do
       request_id: event.payload[:request_id]
     }
   end
-  
+
   # Exclude health check endpoints
   config.lograge.ignore_actions = ['HealthController#index']
 end
@@ -148,7 +148,7 @@ end
 # app/controllers/application_controller.rb
 class ApplicationController < ActionController::API
   before_action :append_info_to_payload
-  
+
   def append_info_to_payload(payload)
     super
     payload[:remote_ip] = request.remote_ip
@@ -201,7 +201,7 @@ gem 'aws-sdk-cloudwatchlogs'
 # config/initializers/cloudwatch_logger.rb
 if Rails.env.production?
   require 'cloudwatch_logger'
-  
+
   Rails.logger = CloudWatchLogger.new(
     ENV['AWS_ACCESS_KEY_ID'],
     ENV['AWS_SECRET_ACCESS_KEY'],
@@ -240,9 +240,9 @@ class OrdersController < ApplicationController
     StatsD.measure('orders.creation_time') do
       @order = Order.create!(order_params)
     end
-    
+
     StatsD.gauge('orders.total_value', @order.total)
-    
+
     render json: @order
   end
 end
@@ -277,12 +277,12 @@ class PrometheusMiddleware
       labels: [:method, :path]
     )
   end
-  
+
   def call(env)
     start = Time.now
     status, headers, body = @app.call(env)
     duration = Time.now - start
-    
+
     @requests.increment(
       labels: {
         method: env['REQUEST_METHOD'],
@@ -290,7 +290,7 @@ class PrometheusMiddleware
         status: status
       }
     )
-    
+
     @duration.observe(
       duration,
       labels: {
@@ -298,7 +298,7 @@ class PrometheusMiddleware
         path: env['PATH_INFO']
       }
     )
-    
+
     [status, headers, body]
   end
 end
@@ -320,7 +320,7 @@ get '/metrics', to: proc { |env|
 # app/controllers/health_controller.rb
 class HealthController < ApplicationController
   skip_before_action :authenticate!
-  
+
   def index
     render json: {
       status: 'ok',
@@ -328,39 +328,39 @@ class HealthController < ApplicationController
       version: Rails.application.config.version
     }
   end
-  
+
   def detailed
     checks = {
       database: check_database,
       redis: check_redis,
       sidekiq: check_sidekiq
     }
-    
+
     status = checks.values.all? { |c| c[:status] == 'ok' } ? 'ok' : 'error'
-    
+
     render json: {
       status: status,
       checks: checks,
       timestamp: Time.current.iso8601
     }, status: status == 'ok' ? :ok : :service_unavailable
   end
-  
+
   private
-  
+
   def check_database
     ActiveRecord::Base.connection.execute('SELECT 1')
     { status: 'ok' }
   rescue => e
     { status: 'error', message: e.message }
   end
-  
+
   def check_redis
     Redis.current.ping
     { status: 'ok' }
   rescue => e
     { status: 'error', message: e.message }
   end
-  
+
   def check_sidekiq
     stats = Sidekiq::Stats.new
     {
@@ -403,7 +403,7 @@ namespace :uptime do
   task check: :environment do
     begin
       response = Net::HTTP.get_response(URI(ENV['APP_URL'] + '/health'))
-      
+
       if response.code == '200'
         puts "✅ Application is up"
         StatsD.increment('uptime.check.success')
@@ -418,7 +418,7 @@ namespace :uptime do
       alert_team("Application is down: #{e.message}")
     end
   end
-  
+
   def alert_team(message)
     SlackNotifier.notify(
       channel: '#alerts',
@@ -442,7 +442,7 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  
+
   grafana:
     image: grafana/grafana
     ports:
@@ -469,17 +469,17 @@ class MetricsCollector
       'app.requests.rate': requests_per_second,
       'app.response_time.avg': average_response_time,
       'app.response_time.p95': p95_response_time,
-      
+
       # Database metrics
       'db.connections.active': active_connections,
       'db.queries.slow': slow_queries_count,
       'db.size': database_size_mb,
-      
+
       # Background jobs
       'jobs.enqueued': Sidekiq::Stats.new.enqueued,
       'jobs.processed': Sidekiq::Stats.new.processed,
       'jobs.failed': Sidekiq::Stats.new.failed,
-      
+
       # Business metrics
       'users.active': User.active.count,
       'orders.today': Order.where(created_at: Time.current.all_day).count,
@@ -501,14 +501,14 @@ class ThresholdMonitor
     database_connections: 20, # 20 active connections
     job_queue_size: 1000     # 1000 jobs in queue
   }
-  
+
   def self.check_all
     check_error_rate
     check_response_time
     check_database_connections
     check_job_queue
   end
-  
+
   def self.check_error_rate
     rate = calculate_error_rate
     if rate > THRESHOLDS[:error_rate]
@@ -518,7 +518,7 @@ class ThresholdMonitor
       )
     end
   end
-  
+
   def self.check_response_time
     avg_time = calculate_avg_response_time
     if avg_time > THRESHOLDS[:response_time]
@@ -528,16 +528,16 @@ class ThresholdMonitor
       )
     end
   end
-  
+
   private
-  
+
   def self.alert(message, severity:)
     SlackNotifier.notify(
       channel: severity == :critical ? '#critical-alerts' : '#alerts',
       text: message,
       color: severity == :critical ? 'danger' : 'warning'
     )
-    
+
     PagerDuty.trigger(message) if severity == :critical
   end
 end
@@ -559,9 +559,9 @@ gem 'rack-mini-profiler'
 # config/initializers/rack_profiler.rb
 if Rails.env.development?
   require 'rack-mini-profiler'
-  
+
   Rack::MiniProfilerRails.initialize!(Rails.application)
-  
+
   Rack::MiniProfiler.config.position = 'bottom-right'
   Rack::MiniProfiler.config.start_hidden = false
 end

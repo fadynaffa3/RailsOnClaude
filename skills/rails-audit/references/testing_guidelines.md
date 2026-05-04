@@ -88,13 +88,13 @@ Every test should follow:
 it "does something" do
   # Setup - create objects and data
   user = create(:user)
-  
+
   # Exercise - execute the code being tested
   result = user.full_name
-  
+
   # Verify - check expectations
   expect(result).to eq "John Doe"
-  
+
   # Teardown - handled by framework
 end
 ```
@@ -289,7 +289,7 @@ end
 RSpec.describe Link, "#score" do
   it "returns upvotes minus downvotes" do
     link = build(:link, upvotes: 5, downvotes: 2)
-    
+
     expect(link.score).to eq 3
   end
 end

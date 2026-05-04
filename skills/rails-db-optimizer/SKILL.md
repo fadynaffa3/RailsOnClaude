@@ -171,7 +171,7 @@ class ChangeUserEmailToNotNull < ActiveRecord::Migration[8.0]
     User.where(email: nil).update_all(email: 'unknown@example.com')
     change_column_null :users, :email, false
   end
-  
+
   def down
     change_column_null :users, :email, true
   end
@@ -183,7 +183,7 @@ end
 # Avoid locking tables during deployment
 class AddIndexConcurrently < ActiveRecord::Migration[8.0]
   disable_ddl_transaction!  # Required for concurrent index creation
-  
+
   def change
     add_index :users, :email, algorithm: :concurrently
   end
@@ -202,7 +202,7 @@ end
 # Good: Use execute or inline class
 class MigrateUserData < ActiveRecord::Migration[8.0]
   class User < ApplicationRecord; end  # Inline model
-  
+
   def up
     User.where(old_status: 'ok').update_all(status: 'active')
   end
@@ -300,7 +300,7 @@ After optimization:
 2. **Measure performance:**
    ```ruby
    require 'benchmark'
-   
+
    Benchmark.ms do
      Post.includes(:user).limit(100).to_a
    end

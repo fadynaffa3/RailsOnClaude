@@ -245,7 +245,7 @@ end
 # Bad: Business logic in callback
 class Invitation < ActiveRecord::Base
   after_create :deliver
-  
+
   def deliver
     Mailer.invitation_notification(self).deliver
   end

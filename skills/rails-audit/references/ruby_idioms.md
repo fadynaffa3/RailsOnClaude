@@ -447,7 +447,7 @@ def process
   return unless user
   return unless user.admin?
   return unless user.active?
-  
+
   grant_access
 end
 ```

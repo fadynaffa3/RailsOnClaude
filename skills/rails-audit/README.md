@@ -57,8 +57,8 @@ cp -r RailsOnClaude/skills/rails-audit ~/.claude/skills/
 
 ## Usage
 
-If you are in your terminal and not in a Claude session, you can invoke the 
-skill directly by using the below. You need to be in the root directory of your 
+If you are in your terminal and not in a Claude session, you can invoke the
+skill directly by using the below. You need to be in the root directory of your
 Rails project.
 
 ### Full application audit

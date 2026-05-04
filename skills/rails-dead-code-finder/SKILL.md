@@ -193,7 +193,7 @@ $ grep -r "ServiceName" app/ lib/ --include="*.rb"
 
 **Test coverage:** Has comprehensive spec file with 100% coverage of unused code.
 
-**Recommendation:** 
+**Recommendation:**
 - **Option A (Remove):** Delete if feature is not planned
 - **Option B (Integrate):** Wire up to controller/background job if needed
 
@@ -348,7 +348,7 @@ Glob: app/serializers/**/*.rb
 ### Searching for Usage
 ```
 # Search for class references (exclude specs)
-Grep: 
+Grep:
   pattern: "ClassName"
   path: "."
   glob: "**/*.rb"

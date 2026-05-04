@@ -190,7 +190,7 @@ grep -rn "require ['\"]pathname['\"]" app/ lib/ --include="*.rb"
 - **Ruby 3.x:** Keep `require "pathname"` - REQUIRED (removing breaks code)
 - **Ruby 4.0+:** Can optionally remove `require "pathname"` - purely cosmetic
 
-**Action:** 
+**Action:**
 - Do NOT remove before upgrading to Ruby 4.0
 - AFTER upgrading to Ruby 4.0: Optionally remove for cleanup
 
@@ -278,7 +278,7 @@ bundle show --paths | xargs -I {} find {} -name "*.c" -o -name "*.so" 2>/dev/nul
 
 **Native extension gems will need recompilation on Ruby 4.0:**
 - mysql2
-- pg  
+- pg
 - nokogiri
 - bootsnap
 - sassc

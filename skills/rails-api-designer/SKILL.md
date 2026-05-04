@@ -2559,9 +2559,9 @@ class Api::BaseController < ApplicationController
   # Override this method in subclasses to customize locale detection
   def detect_locale
     # Priority: query param > Accept-Language header > default
-    locale = params[:locale].presence || 
+    locale = params[:locale].presence ||
              request.headers["Accept-Language"]&.split(",")&.first&.split("-")&.first
-    
+
     # Validate against supported locales
     I18n.available_locales.include?(locale&.to_sym) ? locale.to_sym : I18n.default_locale
   end
@@ -2655,13 +2655,13 @@ ar:
 class MyValidator
   def validate_required(field, value)
     return if value.present?
-    
+
     # I18n.locale is automatically set by around_action
     I18n.t("validations.required", field: field_label(field))
   end
-  
+
   private
-  
+
   def field_label(field)
     # Return localized field name
     I18n.locale == :ar ? @model.label_ar : @model.label_en
@@ -2704,16 +2704,16 @@ RSpec.describe Api::BaseController, type: :controller do
       get :index
       expect(I18n.locale).to eq(:en)
     end
-    
+
     it "does not leak locale between requests" do
       # First request in Arabic
       get :index, params: { locale: "ar" }
       first_locale = I18n.locale
-      
+
       # Second request with no locale
       get :index
       second_locale = I18n.locale
-      
+
       # Locale should reset to default, not persist
       expect(first_locale).to eq(:ar)
       expect(second_locale).to eq(:en)
@@ -2733,19 +2733,19 @@ RSpec.describe "Api::V1::Users", type: :request do
         post "/api/v1/users?locale=ar",
              params: { user: { email: "" } },
              headers: { "Content-Type" => "application/json" }
-        
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
         expect(json["errors"]["email"]).to include("البريد الإلكتروني مطلوب")
       end
     end
-    
+
     context "with English locale" do
       it "returns validation errors in English" do
         post "/api/v1/users?locale=en",
              params: { user: { email: "" } },
              headers: { "Content-Type" => "application/json" }
-        
+
         expect(response).to have_http_status(:unprocessable_entity)
         json = JSON.parse(response.body)
         expect(json["errors"]["email"]).to include("Email is required")

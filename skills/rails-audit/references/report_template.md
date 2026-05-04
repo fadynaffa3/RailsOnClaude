@@ -111,7 +111,7 @@ RSpec.describe ModelName do
   describe "validations" do
     it { is_expected.to validate_presence_of(:field) }
   end
-  
+
   describe "#method_one" do
     it "returns expected result" do
       # test implementation
@@ -290,15 +290,15 @@ Example extraction:
 # app/models/user_profile.rb
 class UserProfile
   include ActiveModel::Model
-  
+
   attr_accessor :user, :bio, :avatar, :website
-  
+
   def initialize(user)
     @user = user
     @bio = user.bio
     # ...
   end
-  
+
   def update(attributes)
     # ...
   end
@@ -325,10 +325,10 @@ Move to explicit method calls in controller or form object:
 # app/models/order_placement.rb
 class OrderPlacement
   include ActiveModel::Model
-  
+
   def complete
     return false unless order.save
-    
+
     send_confirmation_email
     update_inventory
     notify_warehouse
@@ -361,7 +361,7 @@ Extract to form object:
 ```ruby
 def create
   @order_form = OrderForm.new(order_params)
-  
+
   if @order_form.submit
     redirect_to @order_form.order
   else
@@ -396,15 +396,15 @@ Rename to domain model with ActiveModel:
 # app/models/registration.rb
 class Registration
   include ActiveModel::Model
-  
+
   attr_accessor :email, :password, :company_name
-  
+
   validates :email, presence: true
   validates :password, presence: true, length: { minimum: 8 }
-  
+
   def complete
     return false unless valid?
-    
+
     create_user
     create_company
     send_welcome_email

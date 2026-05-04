@@ -158,7 +158,7 @@ end
 # Check for missing before_action
 class AdminController < ApplicationController
   # Missing: before_action :authenticate_admin!
-  
+
   def destroy
     User.find(params[:id]).destroy
   end
@@ -225,7 +225,7 @@ ActiveSupport::MessageEncryptor
 ```ruby
 # Check session configuration
 # config/initializers/session_store.rb
-Rails.application.config.session_store :cookie_store, 
+Rails.application.config.session_store :cookie_store,
   key: '_app_session'
   # Missing: secure: true, httponly: true, same_site: :lax
 ```

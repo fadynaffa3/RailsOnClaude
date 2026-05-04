@@ -106,7 +106,7 @@ Share your skills:
 
 ✨ Features:
 - rails-audit: Comprehensive code quality audits
-- ruby-help: Ruby idioms & best practices  
+- ruby-help: Ruby idioms & best practices
 - rails-help: Rails conventions & patterns
 
 Install: npx skills add fadynaffa3/RailsOnClaude
@@ -181,7 +181,7 @@ gh release create v1.0.0 --title "v1.0.0" --notes "First stable release"
 
 Everything is prepared and ready to go. Just run the GitHub CLI command or create the repo manually, and you're published!
 
-Your skills will help Ruby on Rails developers worldwide write better code with AI assistance. 
+Your skills will help Ruby on Rails developers worldwide write better code with AI assistance.
 
 Thank you for contributing to the Rails community! 🛤️
 

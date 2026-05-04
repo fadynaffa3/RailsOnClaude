@@ -474,7 +474,7 @@ export default class extends Controller {
 
   save() {
     clearTimeout(this.timeout)
-    
+
     this.timeout = setTimeout(() => {
       this.submitForm()
     }, this.intervalValue)
@@ -509,7 +509,7 @@ export default class extends Controller {
     if (this.hasStatusTarget) {
       this.statusTarget.textContent = message
       this.statusTarget.className = `status ${type}`
-      
+
       if (type === "success") {
         setTimeout(() => {
           this.statusTarget.textContent = ""
@@ -528,7 +528,7 @@ export default class extends Controller {
                 autosave_url_value: post_path(@post),
                 action: "input->autosave#save"
               } do |f| %>
-  
+
   <div data-autosave-target="status" class="status"></div>
 
   <%= f.text_field :title, class: "form-control" %>
@@ -555,7 +555,7 @@ export default class extends Controller {
 
   search() {
     clearTimeout(this.timeout)
-    
+
     this.timeout = setTimeout(() => {
       this.performSearch()
     }, this.delayValue)
@@ -654,7 +654,7 @@ export default class extends Controller {
      data-action="turbo:frame-load->modal#open"
      class="modal-backdrop hidden"
      data-modal-target="container">
-  
+
   <div class="modal-content">
     <button data-action="click->modal#close" class="modal-close">×</button>
     <%= turbo_frame_tag "modal" %>
@@ -681,7 +681,7 @@ export default class extends Controller {
 <%= turbo_frame_tag "modal" do %>
   <h1><%= @post.title %></h1>
   <%= simple_format @post.body %>
-  
+
   <div class="modal-actions">
     <%= link_to "Edit", edit_post_path(@post) %>
     <%= button_to "Delete", post_path(@post), method: :delete, data: { turbo_confirm: "Sure?" } %>
@@ -700,11 +700,11 @@ export default class extends Controller {
 
   scroll() {
     const nextPage = this.paginationTarget.querySelector("a[rel='next']")
-    
+
     if (nextPage == null) return
 
     const url = nextPage.href
-    
+
     const windowBottom = window.pageYOffset + window.innerHeight
     const paginationTop = this.paginationTarget.offsetTop
 
@@ -794,7 +794,7 @@ class MegaController extends Controller {
 # Good: Precise updates
 def create
   @comment = @post.comments.create!(comment_params)
-  
+
   respond_to do |format|
     format.turbo_stream do
       render turbo_stream: [
@@ -812,7 +812,7 @@ end
 # Good: Works with and without JavaScript
 def create
   @comment = @post.comments.create!(comment_params)
-  
+
   respond_to do |format|
     format.turbo_stream
     format.html { redirect_to @post } # Fallback
